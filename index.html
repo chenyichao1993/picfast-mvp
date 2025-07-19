@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Upload & Share</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f7f7f7; }
+    .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); padding: 32px 20px 28px 20px; }
+    h2 { text-align: center; font-size: 2rem; margin-bottom: 28px; }
+    form { display: flex; flex-direction: column; gap: 18px; }
+    input[type="file"] { border: 1.5px solid #d0d0d0; border-radius: 6px; padding: 10px; font-size: 1rem; background: #fafbfc; }
+    button { background: #007bff; color: #fff; border: none; border-radius: 6px; padding: 12px; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; }
+    button:disabled { background: #aaa; }
+    button[onclick^="deleteHistory"] { background: #f44336; margin-left: 6px; }
+    button[onclick^="copyToClipboard"] { background: #2196f3; margin-left: 6px; }
+    .result { margin-top: 22px; text-align: center; font-size: 1.1rem; }
+    #history { margin-top: 36px; background: #f8f9fa; border-radius: 8px; padding: 18px 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    #history b { font-size: 1.08rem; }
+    #history a { color: #007bff; word-break: break-all; }
+    #history img { display: block; margin: 8px auto 0 auto; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    #history hr { margin: 16px 0; }
+    #toast {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%) scale(0.98);
+      background: rgba(30, 30, 30, 0.82);
+      color: #fff;
+      padding: 20px 36px;
+      border-radius: 22px;
+      font-size: 1.13rem;
+      z-index: 9999;
+      box-shadow: 0 6px 32px 0 rgba(0,0,0,0.18), 0 1.5px 6px 0 rgba(0,0,0,0.10);
+      text-align: center;
+      min-width: 180px;
+      max-width: 92vw;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      white-space: pre-line;
+      word-break: keep-all;
+      transition: opacity 0.32s cubic-bezier(.4,0,.2,1), transform 0.32s cubic-bezier(.4,0,.2,1);
+      opacity: 0;
+      pointer-events: none;
+      backdrop-filter: blur(8px) saturate(1.2);
+      -webkit-backdrop-filter: blur(8px) saturate(1.2);
+      line-height: 1.5;
+    }
+    #toast.toast-show {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%,-50%) scale(1);
+      pointer-events: auto;
+    }
+    @media (max-width: 600px) {
+      .container { max-width: 98vw; padding: 10vw 2vw 8vw 2vw; }
+      h2 { font-size: 1.3rem; margin-bottom: 18px; }
+      input[type="file"] { font-size: 0.98rem; padding: 8px; }
+      button { font-size: 1rem; padding: 10px; }
+      #history { padding: 10px 2px; }
+      #toast {
+        font-size: 1.01rem;
+        padding: 14px 6vw;
+        min-width: 120px;
+        line-height: 1.7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Image Upload & Share</h2>
+    <form id="uploadForm">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" />
+        <button type="button" id="customFileBtn" style="background:#eee;color:#333;border:1.5px solid #d0d0d0;padding:10px 18px;font-size:1rem;border-radius:6px;min-width:110px;">Choose File</button>
+        <span id="fileName" style="font-size:0.98rem;color:#666;">No file chosen</span>
+      </div>
+      <button type="submit">Upload Image</button>
+    </form>
+    <div id="progressBar" style="display:none;width:100%;height:8px;background:#eee;border-radius:4px;overflow:hidden;margin:10px 0 0 0;">
+      <div id="progressInner" style="height:100%;width:0;background:#007bff;transition:width 0.2s;"></div>
+    </div>
+    <div class="result" id="result"></div>
+    <div id="history" style="margin-top:32px;"></div>
+    <div id="toast"></div>
+  </div>
+  <script>
+    const form = document.getElementById('uploadForm');
+    const result = document.getElementById('result');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('imageInput');
+      if (!fileInput.files.length) {
+        showToast('Please select a file.');
+        return;
+      }
+      const file = fileInput.files[0];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!file.type || !allowedTypes.includes(file.type)) {
+        showToast('Only jpg, jpeg, png, gif, webp formats are supported!');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('image', file);
+      result.textContent = 'Uploading...';
+      showProgress(0);
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/upload');
+        xhr.upload.onprogress = function(e) {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            showProgress(percent);
+          }
+        };
+        xhr.onload = function() {
+          hideProgress();
+          let data = {};
+          try { data = JSON.parse(xhr.responseText); } catch {}
+          if (data.url) {
+            result.innerHTML = `Upload successful!<br>
+              <a href="${data.url}" target="_blank">View Image</a>
+              <button type="button" onclick="copyToClipboard('${data.url}', this)">Copy Link</button>
+              <br><img src="${data.url}" alt="Image" style="max-width:100%;margin-top:10px;" />`;
+            saveHistory(data.url);
+            renderHistory();
+          } else {
+            result.textContent = data.error || 'Upload failed';
+          }
+        };
+        xhr.onerror = function() {
+          hideProgress();
+          result.textContent = 'Upload failed, please try again';
+        };
+        xhr.send(formData);
+      } catch (err) {
+        hideProgress();
+        result.textContent = 'Upload failed, please try again';
+      }
+    });
+
+    // 自定义文件选择按钮逻辑
+    const fileInput = document.getElementById('imageInput');
+    const customFileBtn = document.getElementById('customFileBtn');
+    const fileNameSpan = document.getElementById('fileName');
+    customFileBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        fileNameSpan.textContent = fileInput.files[0].name;
+      } else {
+        fileNameSpan.textContent = 'No file chosen';
+      }
+    });
+
+    // Save history to localStorage
+    function saveHistory(url) {
+      const history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
+      history.unshift({ url, time: new Date().toLocaleString() });
+      // Keep at most 20 records
+      if (history.length > 20) history.length = 20;
+      localStorage.setItem('uploadHistory', JSON.stringify(history));
+    }
+
+    // Render history
+    function renderHistory() {
+      let history = [];
+      try { history = JSON.parse(localStorage.getItem('uploadHistory') || '[]'); } catch {}
+      const historyDiv = document.getElementById('history');
+      if (!historyDiv) return;
+      if (!history.length) {
+        historyDiv.innerHTML = '<em>No history records</em>';
+        return;
+      }
+      historyDiv.innerHTML = '<b>Upload History:</b><br>' + history.map((item, idx) =>
+        `<a href="${item.url}" target="_blank">${item.url}</a>
+         <button type="button" onclick="copyToClipboard('${item.url}', this)">Copy Link</button>
+         <button type="button" onclick="deleteHistory(${idx})" style="margin-left:4px;background:#f44336;">Delete</button>
+         <span style="color:#888;font-size:12px;">${item.time}</span><br><img src="${item.url}" alt="History Image" style="max-width:100px;max-height:60px;margin-bottom:10px;" />`
+      ).join('<hr style="border:none;border-top:1px solid #eee;">');
+    }
+
+    // Delete history
+    function deleteHistory(idx) {
+      let history = [];
+      try { history = JSON.parse(localStorage.getItem('uploadHistory') || '[]'); } catch {}
+      history.splice(idx, 1);
+      localStorage.setItem('uploadHistory', JSON.stringify(history));
+      renderHistory();
+    }
+
+    // Copy to clipboard and show toast
+    function copyToClipboard(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const old = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.textContent = old;
+          btn.disabled = false;
+        }, 1200);
+      });
+    }
+
+    function showProgress(percent) {
+      const bar = document.getElementById('progressBar');
+      const inner = document.getElementById('progressInner');
+      bar.style.display = 'block';
+      inner.style.width = percent + '%';
+    }
+    function hideProgress() {
+      const bar = document.getElementById('progressBar');
+      const inner = document.getElementById('progressInner');
+      inner.style.width = '0';
+      setTimeout(() => { bar.style.display = 'none'; }, 400);
+    }
+
+    // Toast popup
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('toast-show');
+      setTimeout(() => { toast.classList.remove('toast-show'); }, 1500);
+    }
+
+    // Render history on page load
+    window.onload = renderHistory;
+  </script>
+</body>
+</html> 
