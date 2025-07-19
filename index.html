@@ -5,21 +5,217 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image Upload & Share</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f7f7f7; }
-    .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); padding: 32px 20px 28px 20px; }
-    h2 { text-align: center; font-size: 2rem; margin-bottom: 28px; }
-    form { display: flex; flex-direction: column; gap: 18px; }
-    input[type="file"] { border: 1.5px solid #d0d0d0; border-radius: 6px; padding: 10px; font-size: 1rem; background: #fafbfc; }
-    button { background: #007bff; color: #fff; border: none; border-radius: 6px; padding: 12px; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; }
-    button:disabled { background: #aaa; }
-    button[onclick^="deleteHistory"] { background: #f44336; margin-left: 6px; }
-    button[onclick^="copyToClipboard"] { background: #2196f3; margin-left: 6px; }
-    .result { margin-top: 22px; text-align: center; font-size: 1.1rem; }
-    #history { margin-top: 36px; background: #f8f9fa; border-radius: 8px; padding: 18px 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-    #history b { font-size: 1.08rem; }
-    #history a { color: #007bff; word-break: break-all; }
-    #history img { display: block; margin: 8px auto 0 auto; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    #history hr { margin: 16px 0; }
+    body { font-family: 'Inter', 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f6f8fb; }
+    h1 {
+      text-align: center;
+      font-size: 3.5rem;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      font-weight: 900;
+      margin-bottom: 0;
+      letter-spacing: 0.03em;
+      line-height: 1.12;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-top: 60px;
+      margin-bottom: 48px;
+      font-size: 1.18rem;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+    #dropArea {
+      border: 2.5px solid #b3d8fd;
+      border-radius: 12px;
+      padding: 36px 0;
+      text-align: center;
+      color: #007bff;
+      background: #fafdff;
+      margin-bottom: 38px;
+      width: 100%;
+      font-size: 1.13rem;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      font-weight: 500;
+      box-shadow: 0 2px 12px rgba(0,123,255,0.04);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #dropArea.dragover {
+      background: #eaf4ff;
+      border-color: #90c2fa;
+      color: #0056b3;
+      box-shadow: 0 4px 24px rgba(0,123,255,0.10);
+    }
+    #customFileBtn {
+      background: linear-gradient(90deg, #2196f3 0%, #007bff 100%);
+      color: #fff !important;
+      border: none !important;
+      border-radius: 8px;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+      font-size: 1.08rem;
+      font-weight: 600;
+      padding: 12px 28px;
+      outline: none;
+    }
+    #customFileBtn:hover, #customFileBtn:focus {
+      background: linear-gradient(90deg, #007bff 0%, #2196f3 100%);
+      color: #fff !important;
+      box-shadow: 0 6px 24px rgba(0,86,179,0.13);
+      transform: translateY(-2px) scale(1.03);
+    }
+    button[type="submit"] {
+      background: linear-gradient(90deg, #2196f3 0%, #007bff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+      font-size: 1.22rem;
+      font-weight: 700;
+      padding: 0 48px;
+      margin-top: 10px;
+      margin-bottom: 18px;
+      width: auto;
+      min-width: 220px;
+      outline: none;
+      height: 54px;
+      line-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.01em;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    button[type="submit"]:hover, button[type="submit"]:focus {
+      background: linear-gradient(90deg, #007bff 0%, #2196f3 100%);
+      box-shadow: 0 6px 24px rgba(0,86,179,0.13);
+      transform: translateY(-2px) scale(1.03);
+    }
+    button[type="button"] {
+      background: linear-gradient(90deg, #2196f3 0%, #007bff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 8px 18px;
+      outline: none;
+      margin-left: 6px;
+    }
+    button[type="button"]:hover, button[type="button"]:focus {
+      background: linear-gradient(90deg, #007bff 0%, #2196f3 100%);
+      box-shadow: 0 6px 24px rgba(0,86,179,0.13);
+      transform: translateY(-1px) scale(1.04);
+    }
+    button[onclick^="deleteHistory"] {
+      background: #f44336 !important;
+      color: #fff !important;
+      border-radius: 8px;
+      margin-left: 6px;
+      box-shadow: 0 2px 8px rgba(244,67,54,0.08);
+      font-weight: 600;
+    }
+    button[onclick^="deleteHistory"]:hover, button[onclick^="deleteHistory"]:focus {
+      background: #d32f2f !important;
+      box-shadow: 0 6px 24px rgba(244,67,54,0.13);
+    }
+    #fileRow {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    #fileName {
+      font-size: 1.05rem;
+      color: #555;
+      font-weight: 400;
+    }
+    .result {
+      margin-top: 38px;
+      text-align: center;
+      font-size: 1.13rem;
+      width: 100%;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      background: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+      display: none;
+    }
+    .result.show {
+      display: block;
+    }
+    .result img {
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      margin-bottom: 18px;
+      max-width: 100%;
+      height: auto;
+    }
+    .result .copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .result input[type="text"] {
+      width: 60%;
+      font-size: 0.98rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: #fafbfc;
+      margin-right: 0;
+    }
+    .result button[type="button"] {
+      margin-left: 0;
+      min-width: 70px;
+    }
+    .result a {
+      color: #007bff;
+      text-decoration: underline;
+      font-size: 1.08rem;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    /* 上传区与按钮间距拉开 */
+    #dropArea {
+      margin-bottom: 38px;
+    }
+    #history {
+      margin-top: 40px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 22px 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+      width: 100%;
+      max-width: 600px;
+    }
+    #history b {
+      font-size: 1.13rem;
+      font-weight: 700;
+    }
+    #history a {
+      color: #007bff;
+      word-break: break-all;
+    }
+    #history img {
+      display: block;
+      margin: 8px auto 0 auto;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    #history hr {
+      margin: 16px 0;
+    }
     #toast {
       display: none;
       position: fixed;
@@ -53,91 +249,104 @@
       transform: translate(-50%,-50%) scale(1);
       pointer-events: auto;
     }
+    /* 让文件选择行居中 */
+    #fileRow {
+      width: 100%;
+      margin-bottom: 10px;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    /* 上传结果区每行横向布局，标签宽度统一，按钮紧贴input */
+    .result .copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 16px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .result .copy-label {
+      width: 110px;
+      min-width: 90px;
+      text-align: right;
+      font-size: 1.08rem;
+      font-weight: 500;
+      color: #222;
+      margin-right: 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .result input[type="text"] {
+      width: 60%;
+      min-width: 0;
+      font-size: 0.98rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: #fafbfc;
+      margin-right: 0;
+      flex: 1 1 120px;
+    }
+    .result button[type="button"] {
+      margin-left: 10px;
+      min-width: 70px;
+      flex-shrink: 0;
+    }
+    /* 响应式：移动端100%宽度，自动换行 */
     @media (max-width: 600px) {
-      .container { max-width: 98vw; padding: 10vw 2vw 8vw 2vw; }
-      h2 { font-size: 1.3rem; margin-bottom: 18px; }
-      input[type="file"] { font-size: 0.98rem; padding: 8px; }
-      button { font-size: 1rem; padding: 10px; }
-      #history { padding: 10px 2px; }
-      #toast {
-        font-size: 1.01rem;
-        padding: 14px 6vw;
-        min-width: 120px;
-        line-height: 1.7;
+      h1 { font-size: 1.5rem; }
+      .subtitle { font-size: 1rem; }
+      #dropArea { padding: 10vw 2vw; font-size: 1rem; }
+      button[type="submit"] { font-size: 1rem; padding: 12px 0; }
+      #toast { font-size: 1.01rem; padding: 14px 6vw; min-width: 120px; line-height: 1.7; }
+      .result .copy-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .result .copy-label {
+        text-align: left;
+        margin-bottom: 2px;
+        margin-right: 0;
+        width: 100%;
+      }
+      .result input[type="text"] {
+        width: 100%;
+        margin-bottom: 4px;
+      }
+      .result button[type="button"] {
+        width: 100%;
+        margin-left: 0;
+      }
+      #fileRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
       }
     }
-    #dropArea {
-    border: 2px dashed #007bff;
-    border-radius: 8px;
-    padding: 28px 10px;
-    text-align: center;
-    color: #007bff;
-    background: #f4faff;
-    margin-bottom: 18px;
-    transition: background 0.2s, border-color 0.2s;
-    cursor: pointer;
-  }
-  #dropArea.dragover {
-    background: #e3f0ff;
-    border-color: #0056b3;
-    color: #0056b3;
-  }
-  #customFileBtn {
-    background: #007bff !important;
-    color: #fff !important;
-    border: none !important;
-    transition: background 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.08);
-  }
-  #customFileBtn:hover, #customFileBtn:focus {
-    background: #0056b3 !important;
-    color: #fff !important;
-    box-shadow: 0 4px 16px rgba(0,86,179,0.12);
-  }
-  button[type=\"submit\"] {
-    transition: background 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.08);
-  }
-  button[type=\"submit\"]:hover, button[type=\"submit\"]:focus {
-    background: #0056b3;
-    box-shadow: 0 4px 16px rgba(0,86,179,0.12);
-  }
-  @media (max-width: 600px) {
-    #dropArea { padding: 16vw 2vw; font-size: 1rem; }
-  }
   </style>
 </head>
 <body>
-  <div class="container">
-       <h1 style="text-align:center; font-size:2rem; margin-bottom:10px;">Image Upload & Share</h1>
-   <p style="text-align:center; color:#666; margin-top:-10px; margin-bottom:28px; font-size:1.08rem;">Quickly upload images and get shareable links for free.</p>
-   <div id="dropArea">Drag & drop image here or <span id="dropChoose" style="color:#007bff;text-decoration:underline;cursor:pointer;">choose file</span></div>
-   <form id="uploadForm">
-    <div style="display: flex; align-items: center; gap: 10px; display:none;" id="fileRow">
-      <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" />
-      <button type="button" id="customFileBtn" style="background:#007bff;color:#fff;border:none;padding:10px 18px;font-size:1rem;border-radius:6px;min-width:110px;">Choose File</button>
-      <span id="fileName" style="font-size:0.98rem;color:#666;">No file chosen</span>
-    </div>
-      <button type="submit">Upload Image</button>
-    </form>
-    <div id="progressBar" style="display:none;width:100%;height:8px;background:#eee;border-radius:4px;overflow:hidden;margin:10px 0 0 0;">
-      <div id="progressInner" style="height:100%;width:0;background:#007bff;transition:width 0.2s;"></div>
-    </div>
-    <div class="result" id="result"></div>
-    <div id="history" style="margin-top:32px;"></div>
-    <div id="toast"></div>
+  <!-- 平铺布局，无container卡片 -->
+  <h1>Image Upload & Share</h1>
+  <p class="subtitle">Quickly upload images and get shareable links for free.</p>
+  <div id="dropArea">Drag & drop image here or <span id="dropChoose" style="color:#007bff;text-decoration:underline;cursor:pointer;">choose file</span></div>
+  <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" />
+  <div id="fileName" style="text-align:center;color:#666;font-size:1.05rem;margin-top:10px;min-height:1.5em;"></div>
+  <div id="progressBar" style="display:none;width:96%;height:8px;background:#e3f0ff;border-radius:4px;overflow:hidden;margin:10px auto 0 auto;max-width:420px;">
+    <div id="progressInner" style="height:100%;width:0;background:linear-gradient(90deg,#2196f3 0%,#007bff 100%);transition:width 0.2s;"></div>
   </div>
+  <div class="result" id="result"></div>
+  <div id="toast"></div>
+  <!-- 结束平铺布局 -->
   <script>
-    const form = document.getElementById('uploadForm');
     const result = document.getElementById('result');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById('imageInput');
-      if (!fileInput.files.length) {
-        showToast('Please select a file.');
-        return;
-      }
-      const file = fileInput.files[0];
+    // 自动上传逻辑
+    function uploadImage(file) {
+      if (!file) return;
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
       const isHeicExt = /\.heic$/i.test(file.name) || /\.heif$/i.test(file.name);
       if ((file.type && !allowedTypes.includes(file.type)) && !isHeicExt) {
@@ -151,83 +360,76 @@
       formData.append('image', file);
       result.textContent = 'Uploading...';
       showProgress(0);
-      try {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/upload');
-        xhr.upload.onprogress = function(e) {
-          if (e.lengthComputable) {
-            const percent = Math.round((e.loaded / e.total) * 100);
-            showProgress(percent);
-          }
-        };
-        xhr.onload = function() {
-          hideProgress();
-          let data = {};
-          try { data = JSON.parse(xhr.responseText); } catch {}
-          if (data.url) {
-            result.innerHTML = `Upload successful!<br>
-              <a href="${data.url}" target="_blank">View Image</a>
-              <button type="button" onclick="copyToClipboard('${data.url}', this)">Copy Link</button>
-              <br><img src="${data.url}" alt="Image" style="max-width:100%;margin-top:10px;" />`;
-            saveHistory(data.url);
-            renderHistory();
-          } else {
-            result.textContent = data.error || 'Upload failed';
-          }
-        };
-        xhr.onerror = function() {
-          hideProgress();
-          result.textContent = 'Upload failed, please try again';
-        };
-        xhr.send(formData);
-      } catch (err) {
+      result.classList.remove('show');
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/upload');
+      xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          showProgress(percent);
+        }
+      };
+      xhr.onload = function() {
         hideProgress();
+        let data = {};
+        try { data = JSON.parse(xhr.responseText); } catch {}
+        if (data.url) {
+          const direct = location.origin + data.url;
+          const markdown = `![](${direct})`;
+          result.innerHTML = `
+            <div style="margin-bottom:18px;font-weight:bold;font-size:1.18rem;">Upload successful!</div>
+            <img src="${data.url}" alt="Image" style="border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,0.08);margin-bottom:18px;max-width:100%;height:auto;" />
+            <div class="copy-row"><span class="copy-label">Direct Link:</span><input type="text" value="${direct}" readonly /><button type="button" onclick="copyToClipboard('${direct}', this)">Copy</button></div>
+            <div class="copy-row"><span class="copy-label">Markdown:</span><input type="text" value="${markdown}" readonly /><button type="button" onclick="copyToClipboard('${markdown}', this)">Copy</button></div>
+            <div class="copy-row"><span class="copy-label">HTML:</span><input type="text" value="&lt;img src=&quot;${direct}&quot; alt=&quot;Image&quot; /&gt;" readonly /><button type="button" onclick="copyHtmlToClipboard(this)">Copy</button></div>
+            <div style="margin-bottom:8px;"><a href="${data.url}" target="_blank">View Image</a></div>
+          `;
+          result.classList.add('show');
+        } else {
+          result.classList.remove('show');
+          result.textContent = data.error || 'Upload failed';
+        }
+      };
+      xhr.onerror = function() {
+        hideProgress();
+        result.classList.remove('show');
         result.textContent = 'Upload failed, please try again';
-      }
-    });
-  // 拖拽上传功能
-  const dropArea = document.getElementById('dropArea');
-  const fileInput2 = document.getElementById('imageInput');
-  const fileRow = document.getElementById('fileRow');
-  const dropChoose = document.getElementById('dropChoose');
-  dropArea.addEventListener('click', () => fileInput2.click());
-  dropChoose.addEventListener('click', e => { e.stopPropagation(); fileInput2.click(); });
-  ['dragenter','dragover'].forEach(evt => dropArea.addEventListener(evt, e => {
-    e.preventDefault(); e.stopPropagation(); dropArea.classList.add('dragover');
-  }));
-  ['dragleave','drop'].forEach(evt => dropArea.addEventListener(evt, e => {
-    e.preventDefault(); e.stopPropagation(); dropArea.classList.remove('dragover');
-  }));
-  dropArea.addEventListener('drop', e => {
-    if (e.dataTransfer.files && e.dataTransfer.files.length) {
-      fileInput2.files = e.dataTransfer.files;
-      fileRow.style.display = '';
-      fileNameSpan.textContent = fileInput2.files[0].name;
+      };
+      xhr.send(formData);
     }
-  });
-  fileInput2.addEventListener('change', () => {
-    if (fileInput2.files.length) {
-      fileRow.style.display = '';
-      fileNameSpan.textContent = fileInput2.files[0].name;
-    } else {
-      fileRow.style.display = 'none';
-      fileNameSpan.textContent = 'No file chosen';
-    }
-  });
-  // 页面加载时隐藏fileRow
-  fileRow.style.display = 'none';
-    // 自定义文件选择按钮逻辑
+    // 拖拽上传功能
+    // 保证fileInput2和fileInput都指向id为imageInput的input元素
     const fileInput = document.getElementById('imageInput');
-    const customFileBtn = document.getElementById('customFileBtn');
+    const fileInput2 = fileInput;
     const fileNameSpan = document.getElementById('fileName');
-    customFileBtn.addEventListener('click', () => fileInput.click());
+    const dropArea = document.getElementById('dropArea');
+    const dropChoose = document.getElementById('dropChoose');
+    dropArea.addEventListener('click', () => fileInput.click());
+    dropChoose.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
     fileInput.addEventListener('change', () => {
       if (fileInput.files.length) {
         fileNameSpan.textContent = fileInput.files[0].name;
+        uploadImage(fileInput.files[0]);
       } else {
-        fileNameSpan.textContent = 'No file chosen';
+        fileNameSpan.textContent = '';
       }
     });
+    ['dragenter','dragover'].forEach(evt => dropArea.addEventListener(evt, e => {
+      e.preventDefault(); e.stopPropagation(); dropArea.classList.add('dragover');
+    }));
+    ['dragleave','drop'].forEach(evt => dropArea.addEventListener(evt, e => {
+      e.preventDefault(); e.stopPropagation(); dropArea.classList.remove('dragover');
+    }));
+    dropArea.addEventListener('drop', e => {
+      if (e.dataTransfer.files && e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        fileNameSpan.textContent = fileInput.files[0].name;
+        uploadImage(fileInput.files[0]);
+      }
+    });
+    // 自定义文件选择按钮逻辑
+    const customFileBtn = document.getElementById('customFileBtn');
+    customFileBtn.addEventListener('click', () => fileInput.click());
 
     // Save history to localStorage
     function saveHistory(url) {
@@ -301,6 +503,20 @@
 
     // Render history on page load
     window.onload = renderHistory;
+
+    function copyHtmlToClipboard(btn) {
+      const input = btn.previousElementSibling;
+      const html = input.value.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+      navigator.clipboard.writeText(html).then(() => {
+        const old = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.textContent = old;
+          btn.disabled = false;
+        }, 1200);
+      });
+    }
   </script>
 </body>
 </html> 
