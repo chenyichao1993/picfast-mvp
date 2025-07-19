@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 3000;
 const { nanoid } = require('nanoid');
 const fs = require('fs');
 const convert = require('heic-convert');
+const sharp = require('sharp');
 
 // Used to store image IDs and filenames (in-memory, lost after restart, enough for MVP)
 const imageMap = {};
@@ -40,12 +41,25 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     try {
       console.log('[HEIC] Detected HEIC/HEIF file:', filename);
       const inputBuffer = fs.readFileSync(req.file.path);
-      console.log('[HEIC] Read input buffer, size:', inputBuffer.length);
-      const outputBuffer = await convert({
-        buffer: inputBuffer,
-        format: 'JPEG',
-        quality: 1
-      });
+      let outputBuffer;
+      let sharpSuccess = false;
+      // 优先用sharp处理
+      try {
+        outputBuffer = await sharp(inputBuffer).jpeg({ quality: 90 }).toBuffer();
+        sharpSuccess = true;
+        console.log('[HEIC] Converted with sharp');
+      } catch (err) {
+        console.warn('[HEIC] sharp failed, fallback to heic-convert:', err.message);
+      }
+      // sharp失败时用heic-convert兜底
+      if (!sharpSuccess) {
+        outputBuffer = await convert({
+          buffer: inputBuffer,
+          format: 'JPEG',
+          quality: 1
+        });
+        console.log('[HEIC] Converted with heic-convert');
+      }
       outputFilename = filename.replace(/\.(heic|heif)$/i, '.jpg');
       const outputPath = path.join('uploads', outputFilename);
       fs.writeFileSync(outputPath, outputBuffer);
