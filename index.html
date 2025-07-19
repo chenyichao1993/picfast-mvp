@@ -97,10 +97,14 @@
         return;
       }
       const file = fileInput.files[0];
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-      if (!file.type || !allowedTypes.includes(file.type)) {
-        showToast('Only jpg, jpeg, png, gif, webp formats are supported!');
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+      const isHeicExt = /\.heic$/i.test(file.name) || /\.heif$/i.test(file.name);
+      if ((file.type && !allowedTypes.includes(file.type)) && !isHeicExt) {
+        showToast('Only jpg, jpeg, png, gif, webp, heic formats are supported!');
         return;
+      }
+      if (file.type === 'image/heic' || file.type === 'image/heif' || isHeicExt) {
+        showToast('HEIC will be converted to JPG for preview.');
       }
       const formData = new FormData();
       formData.append('image', file);

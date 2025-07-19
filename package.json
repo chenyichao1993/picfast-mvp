@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "express": "^5.1.0",
+    "heic-convert": "^2.1.0",
     "multer": "^2.0.2",
     "nanoid": "^5.1.5"
   }
