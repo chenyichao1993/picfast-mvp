@@ -2139,6 +2139,86 @@
     document.getElementById('mobileWindowsAppLink').addEventListener('click', function() {
       setWindowsAppSEO();
     });
+
+    function setAboutSEO() {
+      document.title = 'About Picfast - Free Image Hosting & Sharing';
+      setMeta('description', 'Learn more about Picfast, our mission, and why thousands trust us for free, fast, and reliable image hosting and sharing.');
+    }
+    document.querySelectorAll('.footer-link').forEach(link => {
+      if (link.textContent === 'About') {
+        link.addEventListener('click', function() { setAboutSEO(); });
+      }
+    });
+
+    function setTermsSEO() {
+      document.title = 'Terms of Use - Picfast';
+      setMeta('description', 'Read the terms of use for Picfast. Understand the rules and policies for uploading and sharing images on our platform.');
+    }
+    document.querySelectorAll('.footer-link').forEach(link => {
+      if (link.textContent === 'Terms of Use') {
+        link.addEventListener('click', function() { setTermsSEO(); });
+      }
+    });
+
+    function setPrivacySEO() {
+      document.title = 'Privacy Policy - Picfast';
+      setMeta('description', 'Read the privacy policy of Picfast. Learn how we protect your data and respect your privacy when you use our image hosting service.');
+    }
+    document.querySelectorAll('.footer-link').forEach(link => {
+      if (link.textContent === 'Privacy Policy') {
+        link.addEventListener('click', function() { setPrivacySEO(); });
+      }
+    });
+
+    function setFAQSEO() {
+      document.title = 'FAQ - Picfast';
+      setMeta('description', 'Frequently Asked Questions about Picfast. Find answers to common questions about image upload, sharing, formats, and more.');
+    }
+    document.querySelectorAll('.footer-link').forEach(link => {
+      if (link.textContent === 'FAQ') {
+        link.addEventListener('click', function() { setFAQSEO(); });
+      }
+    });
+
+    function setContactSEO() {
+      document.title = 'Contact Us - Picfast';
+      setMeta('description', 'Contact Picfast for support, feedback, or questions about our free image hosting and sharing service. We value your feedback and aim to respond quickly.');
+    }
+    document.querySelectorAll('.footer-link').forEach(link => {
+      if (link.textContent === 'Contact us') {
+        link.addEventListener('click', function() { setContactSEO(); });
+      }
+    });
+
+    function setLanguagesSEO() {
+      document.title = 'Languages - Picfast';
+      setMeta('description', 'Choose your preferred language for the Picfast image hosting platform. Multilingual support coming soon!');
+    }
+    document.querySelectorAll('.footer-link').forEach(link => {
+      if (link.textContent === 'Languages') {
+        link.addEventListener('click', function() { setLanguagesSEO(); });
+      }
+    });
+
+    function setUploadByURLSEO() {
+      document.title = 'Upload by URL - Picfast';
+      setMeta('description', 'Upload images to Picfast directly from a URL. Fast, free, and reliable image hosting for all your needs.');
+    }
+    document.querySelectorAll('.footer-link').forEach(link => {
+      if (link.textContent === 'Upload by URL') {
+        link.addEventListener('click', function() { setUploadByURLSEO(); });
+      }
+    });
+
+    function setWebsitePluginsSEO() {
+      document.title = 'Website Plugins - Picfast';
+      setMeta('description', 'Integrate Picfast image hosting with your website using our plugins. Fast, free, and easy image upload solutions for webmasters.');
+    }
+    document.querySelectorAll('.footer-link').forEach(link => {
+      if (link.textContent === 'Website plugins') {
+        link.addEventListener('click', function() { setWebsitePluginsSEO(); });
+      }
+    });
   </script>
   <style>
     /* 优化toast弹窗移动端适配 */
