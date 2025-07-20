@@ -1627,18 +1627,26 @@
     }
 
     // Navigation functionality
+    function hideFooterContentIfShown() {
+      const footerContent = document.getElementById('footerContent');
+      if (footerContent && footerContent.style.display === 'block') {
+        footerContent.style.display = 'none';
+        document.querySelector('.main-content').style.display = '';
+      }
+    }
     document.getElementById('uploadLink').addEventListener('click', function(e) {
       e.preventDefault();
+      hideFooterContentIfShown();
       showUploadPage();
     });
-    
     document.getElementById('myImagesLink').addEventListener('click', function(e) {
       e.preventDefault();
+      hideFooterContentIfShown();
       showManagementPanel();
     });
-    
     document.getElementById('windowsAppLink').addEventListener('click', function(e) {
       e.preventDefault();
+      hideFooterContentIfShown();
       showToast('Windows App coming soon!');
     });
     
@@ -1670,18 +1678,21 @@
     // Mobile navigation links
     document.getElementById('mobileUploadLink').addEventListener('click', function(e) {
       e.preventDefault();
+      hideFooterContentIfShown();
       showUploadPage();
       closeMobileMenu();
     });
     
     document.getElementById('mobileMyImagesLink').addEventListener('click', function(e) {
       e.preventDefault();
+      hideFooterContentIfShown();
       showManagementPanel();
       closeMobileMenu();
     });
     
     document.getElementById('mobileWindowsAppLink').addEventListener('click', function(e) {
       e.preventDefault();
+      hideFooterContentIfShown();
       showToast('Windows App coming soon!');
       closeMobileMenu();
     });
@@ -1757,14 +1768,17 @@
           e.preventDefault();
           showFooterContent(this.textContent);
         } else if (this.textContent === 'Upload') {
+          e.preventDefault();
+          hideFooterContentIfShown();
           showUploadPage();
-          e.preventDefault();
         } else if (this.textContent === 'Windows App') {
+          e.preventDefault();
+          hideFooterContentIfShown();
           showToast('Windows App coming soon!', 'info');
-          e.preventDefault();
         } else if (this.textContent === 'Upload by URL' || this.textContent === 'Website plugins') {
-          showToast('Feature coming soon!', 'info');
           e.preventDefault();
+          hideFooterContentIfShown();
+          showToast('Feature coming soon!', 'info');
         }
       });
     });
