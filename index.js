@@ -8,8 +8,36 @@ const fs = require('fs');
 const convert = require('heic-convert');
 const sharp = require('sharp');
 
-// Used to store image IDs and filenames (in-memory, lost after restart, enough for MVP)
-const imageMap = {};
+// Data storage functions
+
+// Data file path
+const dataFile = path.join(__dirname, 'data.json');
+
+// Load data from JSON file
+function loadData() {
+  try {
+    if (fs.existsSync(dataFile)) {
+      const data = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+      return data.images || {};
+    }
+  } catch (error) {
+    console.error('Error loading data:', error);
+  }
+  return {};
+}
+
+// Save data to JSON file
+function saveData(imageMap) {
+  try {
+    const data = { images: imageMap };
+    fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error('Error saving data:', error);
+  }
+}
+
+// Load existing data
+const imageMap = loadData();
 
 // Set up multer storage config
 const storage = multer.diskStorage({
@@ -74,7 +102,16 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 
   // Generate unique ID
   const id = nanoid(8);
-  imageMap[id] = outputFilename;
+  imageMap[id] = {
+    filename: outputFilename,
+    originalName: req.file.originalname,
+    uploadTime: new Date().toISOString(),
+    size: req.file.size
+  };
+  
+  // Save to JSON file
+  saveData(imageMap);
+  
   // Return both page link and image file link
   const pageUrl = `/img/${id}`;
   const imageUrl = `/uploads/${outputFilename}`;
@@ -87,11 +124,11 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 
 // New: Access image via short link
 app.get('/img/:id', (req, res) => {
-  const filename = imageMap[req.params.id];
-  if (!filename) {
+  const imageData = imageMap[req.params.id];
+  if (!imageData) {
     return res.status(404).send('Image not found');
   }
-  const filePath = path.join(__dirname, 'uploads', filename);
+  const filePath = path.join(__dirname, 'uploads', imageData.filename);
   // Check if file exists
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) return res.status(404).send('Image not found');
@@ -110,6 +147,50 @@ app.get('/', (req, res) => {
 // Static file service for frontend and root directory files
 app.use(express.static(__dirname));
 app.use('/', express.static(path.join(__dirname)));
+
+// Delete image endpoint
+app.delete('/delete/:id', (req, res) => {
+  const id = req.params.id;
+  const imageData = imageMap[id];
+  
+  if (!imageData) {
+    return res.status(404).json({ error: 'Image not found' });
+  }
+  
+  try {
+    // Delete file from uploads folder
+    const filePath = path.join(__dirname, 'uploads', imageData.filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    
+    // Remove from imageMap
+    delete imageMap[id];
+    
+    // Save updated data to JSON file
+    saveData(imageMap);
+    
+    res.json({ success: true, message: 'Image deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    res.status(500).json({ error: 'Failed to delete image' });
+  }
+});
+
+// Get all images endpoint
+app.get('/api/images', (req, res) => {
+  const images = Object.keys(imageMap).map(id => ({
+    id: id,
+    filename: imageMap[id].filename,
+    originalName: imageMap[id].originalName,
+    uploadTime: imageMap[id].uploadTime,
+    size: imageMap[id].size,
+    url: `/img/${id}`,
+    directUrl: `/uploads/${imageMap[id].filename}`
+  }));
+  
+  res.json(images);
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

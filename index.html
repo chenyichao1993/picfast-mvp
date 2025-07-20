@@ -14,6 +14,7 @@
       margin-bottom: 0;
       letter-spacing: 0.03em;
       line-height: 1.12;
+      width: 100%;
     }
     .subtitle {
       text-align: center;
@@ -48,24 +49,7 @@
       color: #0056b3;
       box-shadow: 0 4px 24px rgba(0,123,255,0.10);
     }
-    #customFileBtn {
-      background: linear-gradient(90deg, #2196f3 0%, #007bff 100%);
-      color: #fff !important;
-      border: none !important;
-      border-radius: 8px;
-      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
-      font-size: 1.08rem;
-      font-weight: 600;
-      padding: 12px 28px;
-      outline: none;
-    }
-    #customFileBtn:hover, #customFileBtn:focus {
-      background: linear-gradient(90deg, #007bff 0%, #2196f3 100%);
-      color: #fff !important;
-      box-shadow: 0 6px 24px rgba(0,86,179,0.13);
-      transform: translateY(-2px) scale(1.03);
-    }
+
     button[type="submit"] {
       background: linear-gradient(90deg, #2196f3 0%, #007bff 100%);
       color: #fff;
@@ -302,6 +286,8 @@
       #dropArea { padding: 10vw 2vw; font-size: 1rem; }
       button[type="submit"] { font-size: 1rem; padding: 12px 0; }
       #toast { font-size: 1.01rem; padding: 14px 6vw; min-width: 120px; line-height: 1.7; }
+      .header-container { padding: 0 15px; }
+      .manage-btn { position: static; transform: none; margin-top: 10px; }
       .result .copy-row {
         flex-direction: column;
         align-items: stretch;
@@ -456,13 +442,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       object-fit: contain;
     }
-    .result-filename {
-      font-size: 1.01rem;
-      color: #666;
-      margin-top: 8px;
-      word-break: break-all;
-      text-align: center;
-    }
+
     .result-links {
       width: 66%;
       max-width: 900px;
@@ -532,11 +512,242 @@
       flex-shrink: 0;
       white-space: nowrap;
     }
+    /* Header container for title and manage button */
+    .header-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 15px;
+      position: relative;
+    }
+    .manage-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: background-color 0.2s;
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1000;
+    }
+    .manage-btn:hover {
+      background: #218838;
+    }
+    /* Management panel styles */
+    .management-panel {
+      display: none;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .management-panel.show {
+      display: block;
+    }
+    .image-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .image-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+    .image-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .image-info {
+      flex: 1;
+    }
+    .image-name {
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+    .image-url {
+      font-size: 0.9rem;
+      color: #666;
+      word-break: break-all;
+    }
+    .image-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .delete-btn:hover {
+      background: #c82333;
+    }
+    .copy-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .copy-btn:hover {
+      background: #0056b3;
+    }
+    .back-btn {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+    .back-btn:hover {
+      background: #5a6268;
+    }
+    
+    /* Custom Delete Modal Styles */
+    .delete-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    
+    .delete-modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    .delete-modal h3 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    
+    .delete-modal p {
+      margin: 0 0 25px 0;
+      color: #666;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    
+    .delete-modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    
+    .delete-confirm-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    .delete-confirm-btn:hover {
+      background: #c82333;
+    }
+    
+    .delete-cancel-btn {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    .delete-cancel-btn:hover {
+      background: #5a6268;
+    }
+    
+    /* Responsive design for delete modal */
+    @media (max-width: 600px) {
+      .delete-modal-content {
+        margin: 20% auto;
+        padding: 25px 20px;
+        width: 85%;
+      }
+      
+      .delete-modal h3 {
+        font-size: 1.2rem;
+      }
+      
+      .delete-modal p {
+        font-size: 0.95rem;
+      }
+      
+      .delete-modal-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .delete-confirm-btn,
+      .delete-cancel-btn {
+        width: 100%;
+        padding: 14px 20px;
+      }
+    }
   </style>
 </head>
 <body>
   <!-- 平铺布局，无container卡片 -->
-  <h1>Image Upload & Share</h1>
+  <div class="header-container">
+    <h1>Image Upload & Share</h1>
+    <button id="manageBtn" class="manage-btn">Manage Images</button>
+  </div>
   <p class="subtitle">Quickly upload images and get shareable links for free.</p>
   <div id="dropArea">Drag & drop image here or <span id="dropChoose" style="color:#007bff;text-decoration:underline;cursor:pointer;">choose file</span></div>
   <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" />
@@ -545,12 +756,36 @@
     <div id="progressInner" style="height:100%;width:0;background:linear-gradient(90deg,#2196f3 0%,#007bff 100%);transition:width 0.2s;"></div>
   </div>
   <div class="result" id="result"></div>
+  
+  <!-- Management Panel -->
+  <div class="management-panel" id="managementPanel">
+    <button class="back-btn" id="backBtn">← Back to Upload</button>
+    <h2>Manage Images</h2>
+    <div class="image-list" id="imageList">
+      <!-- Images will be loaded here -->
+    </div>
+  </div>
+  
   <div id="toast"></div>
+  
+  <!-- Custom Delete Confirmation Modal -->
+  <div id="deleteModal" class="delete-modal">
+    <div class="delete-modal-content">
+      <h3>确认删除</h3>
+      <p>确定要删除这张图片吗？</p>
+      <div class="delete-modal-buttons">
+        <button id="deleteConfirmBtn" class="delete-confirm-btn">确定</button>
+        <button id="deleteCancelBtn" class="delete-cancel-btn">取消</button>
+      </div>
+    </div>
+  </div>
+  
   <!-- 结束平铺布局 -->
   <script>
     const result = document.getElementById('result');
     // 自动上传逻辑
     function uploadImage(file) {
+      console.log('Upload started for file:', file.name);
       if (!file) return;
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
       const isHeicExt = /\.heic$/i.test(file.name) || /\.heif$/i.test(file.name);
@@ -564,7 +799,6 @@
       const formData = new FormData();
       formData.append('image', file);
       result.textContent = 'Uploading...';
-      showProgress(0);
       result.classList.remove('show');
       const xhr = new XMLHttpRequest();
       xhr.open('POST', '/upload');
@@ -572,6 +806,9 @@
         if (e.lengthComputable) {
           const percent = Math.round((e.loaded / e.total) * 100);
           showProgress(percent);
+        } else {
+          // 如果无法计算进度，至少显示进度条
+          showProgress(10);
         }
       };
       xhr.onload = function() {
@@ -595,7 +832,7 @@
           const websiteHotlink = `<a href='${pageLink}' target='_blank'><img src='${imageLink}' alt='${filename}' /></a>`;
           const removalLink = `${baseUrl}/delete/${data.url.split('/').pop()}`;
                                   // SVG图标
-            const redditIcon = `<img src='/public/reddit-icon.png' width='24' height='24' alt='Reddit'>`;
+            const redditIcon = `<svg width='24' height='24' viewBox='0 0 24 24' style='vertical-align:middle;margin-right:4px;'><path d='M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z' fill='#FF4500'/></svg>`;
             const githubIcon = `<svg width='24' height='24' viewBox='0 0 20 20' style='vertical-align:middle;margin-right:4px;'><g><circle cx='10' cy='10' r='10' fill='#fff'/><path d='M10 2C5.58 2 2 5.58 2 10c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.013 8.013 0 0 0 18 10c0-4.42-3.58-8-8-8z' fill='#181717'/><rect x='13' y='13' width='5' height='2' rx='1' fill='#f48024'/></g></svg>`;
           // 转义HTML字符串中的特殊字符
           const escapedWebsiteThumb = websiteThumb.replace(/'/g, "\\'").replace(/"/g, '\\"');
@@ -604,7 +841,6 @@
             <div class="result-flex">
               <div class="result-thumb">
                 <img src="${data.url}" alt="Image" />
-                <div class="result-filename">${filename}</div>
               </div>
               <div class="result-links">
                 <div style="margin-bottom:18px;font-weight:bold;font-size:1.18rem;text-align:center;">Upload successful!</div>
@@ -622,14 +858,18 @@
             </div>
           `;
           result.classList.add('show');
+          result.style.display = 'block';
+          console.log('Upload successful, result displayed');
         } else {
           result.classList.remove('show');
+          result.style.display = 'block';
           result.textContent = data.error || 'Upload failed';
         }
       };
       xhr.onerror = function() {
         hideProgress();
         result.classList.remove('show');
+        result.style.display = 'block';
         result.textContent = 'Upload failed, please try again';
       };
       xhr.send(formData);
@@ -664,45 +904,165 @@
         uploadImage(fileInput.files[0]);
       }
     });
-    // 自定义文件选择按钮逻辑
-    const customFileBtn = document.getElementById('customFileBtn');
-    customFileBtn.addEventListener('click', () => fileInput.click());
+    // 自定义文件选择按钮逻辑 - 移除不存在的元素引用
 
-    // Save history to localStorage
-    function saveHistory(url) {
-      const history = JSON.parse(localStorage.getItem('uploadHistory') || '[]');
-      history.unshift({ url, time: new Date().toLocaleString() });
-      // Keep at most 20 records
-      if (history.length > 20) history.length = 20;
-      localStorage.setItem('uploadHistory', JSON.stringify(history));
+    // Management panel functionality
+    const manageBtn = document.getElementById('manageBtn');
+    const backBtn = document.getElementById('backBtn');
+    const managementPanel = document.getElementById('managementPanel');
+    const imageList = document.getElementById('imageList');
+    const progressBar = document.getElementById('progressBar');
+
+    // Show management panel
+    function showManagementPanel() {
+      // Hide main content
+      document.getElementById('dropArea').style.display = 'none';
+      progressBar.style.display = 'none';
+      document.getElementById('result').style.display = 'none';
+      document.querySelector('h1').style.display = 'none';
+      document.querySelector('.subtitle').style.display = 'none';
+      document.querySelector('#fileName').style.display = 'none';
+      document.querySelector('#imageInput').style.display = 'none';
+      
+      // Show management panel
+      managementPanel.classList.add('show');
+      loadImageList();
     }
 
-    // Render history
-    function renderHistory() {
-      let history = [];
-      try { history = JSON.parse(localStorage.getItem('uploadHistory') || '[]'); } catch {}
-      const historyDiv = document.getElementById('history');
-      if (!historyDiv) return;
-      if (!history.length) {
-        historyDiv.innerHTML = '<em>No history records</em>';
-        return;
+    // Hide management panel
+    function hideManagementPanel() {
+      // Show main content
+      document.getElementById('dropArea').style.display = '';
+      document.querySelector('h1').style.display = '';
+      document.querySelector('.subtitle').style.display = '';
+      document.querySelector('#imageInput').style.display = 'none'; // Keep hidden as it should be
+      
+      // Reset upload state - but keep result content if it exists
+      progressBar.style.display = 'none';
+      document.getElementById('progressInner').style.width = '0';
+      document.getElementById('fileName').style.display = 'none';
+      document.getElementById('fileName').textContent = '';
+      
+      // Clear file input
+      document.getElementById('imageInput').value = '';
+      
+      // Hide management panel
+      managementPanel.classList.remove('show');
+    }
+
+    // Load image list
+    async function loadImageList() {
+      try {
+        const response = await fetch('/api/images');
+        const images = await response.json();
+        
+        if (images.length === 0) {
+          imageList.innerHTML = '<p style="text-align:center;color:#666;margin:20px;">No images uploaded yet.</p>';
+          return;
+        }
+
+        // Sort images by upload time, newest first
+        const sortedImages = images.sort((a, b) => new Date(b.uploadTime) - new Date(a.uploadTime));
+
+        imageList.innerHTML = sortedImages.map(image => `
+          <div class="image-item">
+            <img src="${image.directUrl}" alt="${image.originalName}" onerror="this.style.display='none'">
+            <div class="image-info">
+              <div class="image-name">${image.originalName}</div>
+              <div class="image-url">${window.location.origin}${image.url}</div>
+              <div style="font-size:0.8rem;color:#888;margin-top:5px;">
+                Uploaded: ${new Date(image.uploadTime).toLocaleString()}
+              </div>
+            </div>
+            <div class="image-actions">
+              <button class="copy-btn" onclick="copyToClipboard('${window.location.origin}${image.url}', this)">Copy Link</button>
+              <button class="delete-btn" onclick="deleteImage('${image.id}', this)">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading images:', error);
+        imageList.innerHTML = '<p style="text-align:center;color:#dc3545;margin:20px;">Error loading images.</p>';
       }
-      historyDiv.innerHTML = '<b>Upload History:</b><br>' + history.map((item, idx) =>
-        `<a href="${item.url}" target="_blank">${item.url}</a>
-         <button type="button" onclick="copyToClipboard('${item.url}', this)">Copy Link</button>
-         <button type="button" onclick="deleteHistory(${idx})" style="margin-left:4px;background:#f44336;">Delete</button>
-         <span style="color:#888;font-size:12px;">${item.time}</span><br><img src="${item.url}" alt="History Image" style="max-width:100px;max-height:60px;margin-bottom:10px;" />`
-      ).join('<hr style="border:none;border-top:1px solid #eee;">');
     }
 
-    // Delete history
-    function deleteHistory(idx) {
-      let history = [];
-      try { history = JSON.parse(localStorage.getItem('uploadHistory') || '[]'); } catch {}
-      history.splice(idx, 1);
-      localStorage.setItem('uploadHistory', JSON.stringify(history));
-      renderHistory();
+    // Delete image
+    async function deleteImage(id, button) {
+      // Show custom delete modal
+      const deleteModal = document.getElementById('deleteModal');
+      const confirmBtn = document.getElementById('deleteConfirmBtn');
+      const cancelBtn = document.getElementById('deleteCancelBtn');
+      
+      deleteModal.style.display = 'block';
+      
+      // Handle confirm
+      const handleConfirm = async () => {
+        deleteModal.style.display = 'none';
+        button.disabled = true;
+        button.textContent = 'Deleting...';
+
+        try {
+          const response = await fetch(`/delete/${id}`, { method: 'DELETE' });
+          const result = await response.json();
+
+          if (result.success) {
+            button.closest('.image-item').remove();
+            showToast('Image deleted successfully');
+            
+            // If no images left, show empty message
+            if (imageList.children.length === 0) {
+              imageList.innerHTML = '<p style="text-align:center;color:#666;margin:20px;">No images uploaded yet.</p>';
+            }
+          } else {
+            showToast('Failed to delete image');
+            button.disabled = false;
+            button.textContent = 'Delete';
+          }
+        } catch (error) {
+          console.error('Error deleting image:', error);
+          showToast('Error deleting image');
+          button.disabled = false;
+          button.textContent = 'Delete';
+        }
+      };
+      
+      // Handle cancel
+      const handleCancel = () => {
+        deleteModal.style.display = 'none';
+      };
+      
+      // Add event listeners
+      confirmBtn.onclick = handleConfirm;
+      cancelBtn.onclick = handleCancel;
+      
+      // Close modal when clicking outside
+      deleteModal.onclick = (e) => {
+        if (e.target === deleteModal) {
+          handleCancel();
+        }
+      };
+      
+      // Close modal with Escape key
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          handleCancel();
+          document.removeEventListener('keydown', handleEscape);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
     }
+
+    // Event listeners
+    manageBtn.addEventListener('click', () => {
+      console.log('Manage button clicked');
+      showManagementPanel();
+    });
+    backBtn.addEventListener('click', () => {
+      console.log('Back button clicked');
+      hideManagementPanel();
+    });
+
+
 
     // Copy to clipboard and show toast
     function copyToClipboard(text, btn) {
@@ -738,8 +1098,18 @@
       setTimeout(() => { toast.classList.remove('toast-show'); }, 1500);
     }
 
-    // Render history on page load
-    window.onload = renderHistory;
+    // Initialize page state
+    function initializePage() {
+      // Reset upload state
+      progressBar.style.display = 'none';
+      document.getElementById('progressInner').style.width = '0';
+      document.getElementById('fileName').style.display = 'none';
+      document.getElementById('fileName').textContent = '';
+      document.getElementById('imageInput').value = '';
+    }
+
+    // Initialize page on load
+    window.onload = initializePage;
 
     function copyHtmlToClipboard(btn) {
       const input = btn.previousElementSibling;
