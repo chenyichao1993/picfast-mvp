@@ -1118,6 +1118,55 @@
   }
 }
 </style>
+  <style>
+    #backToTopBtn {
+      display: none;
+      position: fixed;
+      right: 28px;
+      bottom: 160px;
+      z-index: 3000;
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      background: #007bff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, opacity 0.3s;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #backToTopBtn.show {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+      animation: fadeInBtn 0.3s;
+    }
+    #backToTopBtn:hover {
+      background: #0056b3;
+      box-shadow: 0 4px 16px rgba(0,86,179,0.18);
+    }
+    @keyframes fadeInBtn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @media (max-width: 600px) {
+      #backToTopBtn {
+        width: 48px;
+        height: 48px;
+        right: 8px;
+        bottom: 200px;
+      }
+      #backToTopBtn svg {
+        width: 26px;
+        height: 26px;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- Header with Logo and Navigation -->
@@ -2030,6 +2079,19 @@
       updateCheckboxEvents();
       updateBatchButtons();
     };
+
+    // --- Back to Top button logic ---
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 200) {
+        backToTopBtn.classList.add('show');
+      } else {
+        backToTopBtn.classList.remove('show');
+      }
+    });
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   </script>
   <style>
     /* 优化toast弹窗移动端适配 */
@@ -2102,5 +2164,23 @@
       }
     }
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const backToTopBtn = document.getElementById('backToTopBtn');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 200) {
+          backToTopBtn.classList.add('show');
+        } else {
+          backToTopBtn.classList.remove('show');
+        }
+      });
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+  <button id="backToTopBtn" aria-label="Back to top">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
 </body>
 </html> 
