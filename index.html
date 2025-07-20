@@ -1751,26 +1751,78 @@
         document.querySelector('.main-content').style.display = '';
       }
     }
+    // --- SPA友好URL美化（不影响功能）---
+    function updateUrl(path) {
+      if (window.location.pathname !== path) {
+        window.history.pushState({}, '', path);
+      }
+    }
+    // 主导航
     document.getElementById('uploadLink').addEventListener('click', function(e) {
       e.preventDefault();
       hideFooterContentIfShown();
       showUploadPage();
+      updateUrl('/');
     });
     document.getElementById('myImagesLink').addEventListener('click', function(e) {
       e.preventDefault();
       hideFooterContentIfShown();
       showManagementPanel();
+      updateUrl('/my-images');
     });
     document.getElementById('windowsAppLink').addEventListener('click', function(e) {
       e.preventDefault();
       hideFooterContentIfShown();
       showToast('Windows App coming soon!');
+      updateUrl('/windows-app');
+    });
+    // 移动端主导航
+    document.getElementById('mobileUploadLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      hideFooterContentIfShown();
+      showUploadPage();
+      updateUrl('/');
+      closeMobileMenu();
+    });
+    document.getElementById('mobileMyImagesLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      hideFooterContentIfShown();
+      showManagementPanel();
+      updateUrl('/my-images');
+      closeMobileMenu();
+    });
+    document.getElementById('mobileWindowsAppLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      hideFooterContentIfShown();
+      showToast('Windows App coming soon!');
+      updateUrl('/windows-app');
+      closeMobileMenu();
+    });
+    // Footer导航
+    document.querySelectorAll('.footer-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const txt = link.textContent.trim();
+        if (txt === 'Upload') {
+          updateUrl('/');
+        } else if (txt === 'About') updateUrl('/about');
+        else if (txt === 'Terms of Use') updateUrl('/terms');
+        else if (txt === 'Privacy Policy') updateUrl('/privacy');
+        else if (txt === 'FAQ') updateUrl('/faq');
+        else if (txt === 'Contact us') updateUrl('/contact');
+        else if (txt === 'Languages') updateUrl('/languages');
+        else if (txt === 'Upload by URL') updateUrl('/upload-by-url');
+        else if (txt === 'Website plugins') updateUrl('/website-plugins');
+      });
     });
     
-    // Logo click functionality
+    // Logo点击回首页并美化URL
     document.querySelector('.logo-img').addEventListener('click', function() {
       hideFooterContentIfShown();
       showUploadPage();
+      if (window.location.pathname !== '/') {
+        window.history.pushState({}, '', '/');
+      }
     });
     
     // Mobile menu functionality
@@ -1791,28 +1843,6 @@
         spans[1].style.opacity = '1';
         spans[2].style.transform = 'none';
       }
-    });
-    
-    // Mobile navigation links
-    document.getElementById('mobileUploadLink').addEventListener('click', function(e) {
-      e.preventDefault();
-      hideFooterContentIfShown();
-      showUploadPage();
-      closeMobileMenu();
-    });
-    
-    document.getElementById('mobileMyImagesLink').addEventListener('click', function(e) {
-      e.preventDefault();
-      hideFooterContentIfShown();
-      showManagementPanel();
-      closeMobileMenu();
-    });
-    
-    document.getElementById('mobileWindowsAppLink').addEventListener('click', function(e) {
-      e.preventDefault();
-      hideFooterContentIfShown();
-      showToast('Windows App coming soon!');
-      closeMobileMenu();
     });
     
     // Close mobile menu function
@@ -2232,6 +2262,36 @@
       if (link.textContent === 'Website plugins') {
         link.addEventListener('click', function() { setWebsitePluginsSEO(); });
       }
+    });
+
+    // Windows App按钮URL美化（主导航和移动端）
+    document.getElementById('windowsAppLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      hideFooterContentIfShown();
+      showToast('Windows App coming soon!');
+      setTimeout(() => { updateUrl('/windows-app'); }, 0);
+    });
+    document.getElementById('mobileWindowsAppLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      hideFooterContentIfShown();
+      showToast('Windows App coming soon!');
+      setTimeout(() => { updateUrl('/windows-app'); }, 0);
+      closeMobileMenu();
+    });
+    // Login/Sign Up按钮URL美化
+    document.querySelectorAll('.login-btn, .mobile-login-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        showToast('Login coming soon!');
+        setTimeout(() => { updateUrl('/login'); }, 0);
+      });
+    });
+    document.querySelectorAll('.signup-btn, .mobile-signup-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        showToast('Sign Up coming soon!');
+        setTimeout(() => { updateUrl('/signup'); }, 0);
+      });
     });
   </script>
   <style>
