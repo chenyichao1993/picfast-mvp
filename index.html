@@ -327,6 +327,170 @@
         gap: 6px;
       }
     }
+    /* CSS优化：结果区每行标签左对齐，input和按钮100%宽度，内容可换行，整体平铺页面不包裹在卡片。下方内容最大宽度放宽，移动端100%宽度。*/
+    .result { max-width: 100vw; }
+    .result .copy-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 0; margin-bottom: 16px; width: 100%; flex-wrap: wrap; }
+    .result .copy-label { min-width: 120px; max-width: 220px; text-align: left; font-size: 1.08rem; font-weight: 500; color: #222; margin-right: 10px; white-space: pre-line; flex-shrink: 0; word-break: break-all; display: flex; align-items: center; }
+    .result input[type="text"] { width: 100%; min-width: 0; font-size: 0.98rem; border: 1px solid #e0e0e0; border-radius: 6px; padding: 6px 8px; background: #fafbfc; margin-right: 0; flex: 1 1 120px; word-break: break-all; }
+    .result button[type="button"] { margin-left: 10px; min-width: 70px; flex-shrink: 0; }
+    @media (max-width: 900px) {
+      .result-flex {
+        gap: 20px;
+      }
+      .result-thumb img {
+        max-width: 250px;
+        max-height: 250px;
+      }
+      .result-links {
+        width: 90%;
+        max-width: 700px;
+      }
+    }
+    @media (max-width: 600px) {
+  .upload-container {
+    padding: 0 15px;
+  }
+  .result-flex {
+    gap: 16px;
+  }
+  .result-thumb img {
+    max-width: 200px;
+    max-height: 200px;
+  }
+  .result-links {
+    width: 100%;
+    max-width: 100%;
+    text-align: left;
+  }
+  .result-links .copy-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    margin-bottom: 12px;
+    justify-content: flex-start;
+  }
+  .result-links .copy-label {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 2px;
+    font-size: 1rem;
+  }
+  .result-links input[type="text"] {
+    width: 100%;
+    margin-bottom: 2px;
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+  .result-links button[type="button"] {
+    width: 100%;
+    align-self: flex-end;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+}
+    .upload-container {
+      max-width: 100%;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+    .result {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+    /* CSS优化：图片缩略图居左，宽度固定，链接区最大宽度600px，input和按钮宽度自适应，整体平铺页面。*/
+    .result-flex {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      width: 100%;
+      max-width: 100%;
+    }
+    .result-thumb {
+      text-align: center;
+      margin-bottom: 0;
+    }
+    .result-thumb img {
+      max-width: 280px;
+      max-height: 280px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      object-fit: contain;
+    }
+    .result-filename {
+      font-size: 1.01rem;
+      color: #666;
+      margin-top: 8px;
+      word-break: break-all;
+      text-align: center;
+    }
+    .result-links {
+      width: 66%;
+      max-width: 900px;
+      min-width: 0;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .result-links .copy-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  margin-bottom: 16px;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+    .result-links .copy-label {
+      text-align: right;
+      font-size: 1.08rem;
+      font-weight: 500;
+      color: #222;
+      margin-right: 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .result-links .copy-label svg {
+      vertical-align: middle;
+      margin-right: 6px;
+      flex-shrink: 0;
+    }
+    .result-links input[type="text"] {
+      flex: 1;
+      min-width: 400px;
+      font-size: 0.95rem;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      background: #f8f9fa;
+      margin-right: 0;
+      word-break: break-all;
+      overflow-x: auto;
+      white-space: nowrap;
+      font-family: 'Courier New', monospace;
+      color: #333;
+    }
+    .result-links input[type="text"]:focus {
+      outline: none;
+      border-color: #007bff;
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+    }
+    .result-links button[type="button"] {
+      margin-left: 12px;
+      min-width: 70px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -335,7 +499,7 @@
   <p class="subtitle">Quickly upload images and get shareable links for free.</p>
   <div id="dropArea">Drag & drop image here or <span id="dropChoose" style="color:#007bff;text-decoration:underline;cursor:pointer;">choose file</span></div>
   <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" />
-  <div id="fileName" style="text-align:center;color:#666;font-size:1.05rem;margin-top:10px;min-height:1.5em;"></div>
+  <div id="fileName" style="display:none;"></div>
   <div id="progressBar" style="display:none;width:96%;height:8px;background:#e3f0ff;border-radius:4px;overflow:hidden;margin:10px auto 0 auto;max-width:420px;">
     <div id="progressInner" style="height:100%;width:0;background:linear-gradient(90deg,#2196f3 0%,#007bff 100%);transition:width 0.2s;"></div>
   </div>
@@ -375,14 +539,38 @@
         try { data = JSON.parse(xhr.responseText); } catch {}
         if (data.url) {
           const direct = location.origin + data.url;
-          const markdown = `![](${direct})`;
+          const filename = (fileInput.files[0] && fileInput.files[0].name) || 'image';
+          // 对标postimg的两种Markdown格式
+          const markdownReddit = `[${filename}](${direct})`;
+          const markdownGithub = `[![${filename}](${direct})](${direct})`;
+          const forumThumb = `[url=${direct}][img]${direct}[/img][/url]`;
+          const websiteThumb = `<a href='${direct}' target='_blank'><img src='${direct}' alt='${filename}' /></a>`;
+          const forumHotlink = `[url=${direct}][img]${direct}[/img][/url]`;
+          const websiteHotlink = `<a href='${direct}' target='_blank'><img src='${direct}' alt='${filename}' /></a>`;
+          const removalLink = `${location.origin}/delete/${data.url.split('/').pop()}`;
+          // SVG图标
+          const redditIcon = `<svg width='20' height='20' viewBox='0 0 20 20' style='vertical-align:middle;margin-right:4px;'><g><circle cx='10' cy='10' r='10' fill='#fff'/><circle cx='10' cy='10' r='9' fill='#ff4500'/><ellipse cx='10' cy='15' rx='6' ry='3' fill='#fff'/><circle cx='7' cy='10' r='2' fill='#fff'/><circle cx='13' cy='10' r='2' fill='#fff'/><circle cx='7' cy='10' r='1' fill='#000'/><circle cx='13' cy='10' r='1' fill='#000'/><circle cx='14.5' cy='5.5' r='1.2' fill='#fff'/><circle cx='14.5' cy='5.5' r='0.8' fill='#ff4500'/><path d='M14.5 5.5l-3.2-1' stroke='#000' stroke-width='0.5' fill='none'/></g></svg>`;
+          const githubIcon = `<svg width='20' height='20' viewBox='0 0 20 20' style='vertical-align:middle;margin-right:4px;'><g><circle cx='10' cy='10' r='10' fill='#fff'/><path d='M10 2C5.58 2 2 5.58 2 10c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.013 8.013 0 0 0 18 10c0-4.42-3.58-8-8-8z' fill='#181717'/><rect x='13' y='13' width='5' height='2' rx='1' fill='#f48024'/></g></svg>`;
           result.innerHTML = `
-            <div style="margin-bottom:18px;font-weight:bold;font-size:1.18rem;">Upload successful!</div>
-            <img src="${data.url}" alt="Image" style="border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,0.08);margin-bottom:18px;max-width:100%;height:auto;" />
-            <div class="copy-row"><span class="copy-label">Direct Link:</span><input type="text" value="${direct}" readonly /><button type="button" onclick="copyToClipboard('${direct}', this)">Copy</button></div>
-            <div class="copy-row"><span class="copy-label">Markdown:</span><input type="text" value="${markdown}" readonly /><button type="button" onclick="copyToClipboard('${markdown}', this)">Copy</button></div>
-            <div class="copy-row"><span class="copy-label">HTML:</span><input type="text" value="&lt;img src=&quot;${direct}&quot; alt=&quot;Image&quot; /&gt;" readonly /><button type="button" onclick="copyHtmlToClipboard(this)">Copy</button></div>
-            <div style="margin-bottom:8px;"><a href="${data.url}" target="_blank">View Image</a></div>
+            <div class="result-flex">
+              <div class="result-thumb">
+                <img src="${data.url}" alt="Image" />
+                <div class="result-filename">${filename}</div>
+              </div>
+              <div class="result-links">
+                <div style="margin-bottom:18px;font-weight:bold;font-size:1.18rem;text-align:center;">Upload successful!</div>
+                <div class="copy-row"><span class="copy-label">Link:</span><input type="text" value="${direct}" readonly /><button type="button" onclick="copyToClipboard('${direct}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Direct link:</span><input type="text" value="${direct}" readonly /><button type="button" onclick="copyToClipboard('${direct}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">${redditIcon}Markdown:</span><input type="text" value="${markdownReddit}" readonly /><button type="button" onclick="copyToClipboard('${markdownReddit}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">${githubIcon}Markdown:</span><input type="text" value="${markdownGithub}" readonly /><button type="button" onclick="copyToClipboard('${markdownGithub}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Thumbnail for forums:</span><input type="text" value="${forumThumb}" readonly /><button type="button" onclick="copyToClipboard('${forumThumb}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Thumbnail for website:</span><input type="text" value="${websiteThumb}" readonly /><button type="button" onclick="copyToClipboard('${websiteThumb}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Hotlink for forums:</span><input type="text" value="${forumHotlink}" readonly /><button type="button" onclick="copyToClipboard('${forumHotlink}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Hotlink for website:</span><input type="text" value="${websiteHotlink}" readonly /><button type="button" onclick="copyToClipboard('${websiteHotlink}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Removal link:</span><input type="text" value="${removalLink}" readonly /><button type="button" onclick="copyToClipboard('${removalLink}', this)">Copy</button></div>
+                <div style="margin-bottom:8px;text-align:center;"><a href="${data.url}" target="_blank">View Image</a></div>
+              </div>
+            </div>
           `;
           result.classList.add('show');
         } else {
