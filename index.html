@@ -121,6 +121,11 @@
       transition: all 0.3s;
     }
     
+    /* Desktop styles - hide mobile menu */
+    .mobile-menu {
+      display: none;
+    }
+    
     /* Mobile responsive */
     @media (max-width: 768px) {
       .main-nav {
@@ -137,6 +142,85 @@
       
       .header-content {
         padding: 0 15px;
+      }
+      
+      /* Mobile menu styles */
+      .mobile-menu {
+        display: block;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border-bottom: 1px solid #e1e5e9;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transform: translateY(-100%);
+        transition: transform 0.3s ease;
+        z-index: 999;
+      }
+      
+      .mobile-menu.show {
+        transform: translateY(0);
+      }
+      
+      .mobile-menu-content {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .mobile-nav-link {
+        text-decoration: none;
+        color: #666;
+        font-weight: 500;
+        font-size: 16px;
+        padding: 12px 16px;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+      
+      .mobile-nav-link:hover {
+        color: #007bff;
+        background: #f8f9fa;
+      }
+      
+      .mobile-nav-link.active {
+        color: #007bff;
+        background: #e3f2fd;
+      }
+      
+      .mobile-user-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #e1e5e9;
+      }
+      
+      .mobile-login-btn {
+        text-decoration: none;
+        color: #007bff;
+        font-weight: 500;
+        font-size: 16px;
+        padding: 12px 16px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        flex: 1;
+        text-align: center;
+      }
+      
+      .mobile-signup-btn {
+        text-decoration: none;
+        color: #fff;
+        background: #007bff;
+        font-weight: 500;
+        font-size: 16px;
+        padding: 12px 16px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        flex: 1;
+        text-align: center;
       }
     }
     .page-title {
@@ -987,6 +1071,20 @@
       </button>
     </div>
   </header>
+  
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-content">
+      <a href="#" class="mobile-nav-link active" id="mobileUploadLink">Upload</a>
+      <a href="#" class="mobile-nav-link" id="mobileMyImagesLink">My Images</a>
+      <a href="#" class="mobile-nav-link" id="mobileWindowsAppLink">Windows App</a>
+      
+      <div class="mobile-user-actions">
+        <a href="#" class="mobile-login-btn">Login</a>
+        <a href="#" class="mobile-signup-btn">Sign Up</a>
+      </div>
+    </div>
+  </div>
   <!-- Page Title -->
   <div class="page-title">
     <h1>Image Upload & Share</h1>
@@ -1180,7 +1278,9 @@
       
       // Update navigation
       document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-link').forEach(link => link.classList.remove('active'));
       document.getElementById('myImagesLink').classList.add('active');
+      document.getElementById('mobileMyImagesLink').classList.add('active');
     }
 
     // Hide management panel
@@ -1204,7 +1304,9 @@
       
       // Update navigation
       document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-link').forEach(link => link.classList.remove('active'));
       document.getElementById('uploadLink').classList.add('active');
+      document.getElementById('mobileUploadLink').classList.add('active');
     }
 
     // Load image list
@@ -1392,9 +1494,58 @@
     });
     
     // Mobile menu functionality
-    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-      // TODO: Implement mobile menu
-      showToast('Mobile menu coming soon!');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    mobileMenuBtn.addEventListener('click', function() {
+      mobileMenu.classList.toggle('show');
+      
+      // Animate hamburger menu
+      const spans = this.querySelectorAll('span');
+      if (mobileMenu.classList.contains('show')) {
+        spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+        spans[1].style.opacity = '0';
+        spans[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+      } else {
+        spans[0].style.transform = 'none';
+        spans[1].style.opacity = '1';
+        spans[2].style.transform = 'none';
+      }
+    });
+    
+    // Mobile navigation links
+    document.getElementById('mobileUploadLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      showUploadPage();
+      closeMobileMenu();
+    });
+    
+    document.getElementById('mobileMyImagesLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      showManagementPanel();
+      closeMobileMenu();
+    });
+    
+    document.getElementById('mobileWindowsAppLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      showToast('Windows App coming soon!');
+      closeMobileMenu();
+    });
+    
+    // Close mobile menu function
+    function closeMobileMenu() {
+      mobileMenu.classList.remove('show');
+      const spans = mobileMenuBtn.querySelectorAll('span');
+      spans[0].style.transform = 'none';
+      spans[1].style.opacity = '1';
+      spans[2].style.transform = 'none';
+    }
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!mobileMenuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+        closeMobileMenu();
+      }
     });
     
     // Show upload page function
@@ -1416,7 +1567,9 @@
       
       // Update navigation
       document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-link').forEach(link => link.classList.remove('active'));
       document.getElementById('uploadLink').classList.add('active');
+      document.getElementById('mobileUploadLink').classList.add('active');
     }
     
     // Initialize page on load
