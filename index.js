@@ -8,6 +8,121 @@ const fs = require('fs');
 const convert = require('heic-convert');
 const sharp = require('sharp');
 
+// Rate limiting storage
+const rateLimitStore = new Map();
+
+// Rate limiting configuration
+const RATE_LIMITS = {
+  perMinute: 15,   // 每分钟最多15次上传
+  perHour: 100,    // 每小时最多100次上传
+  perDay: 150,     // 每天最多150次上传
+  hourlySize: 50 * 1024 * 1024  // 每小时累计文件大小不超过50MB
+};
+
+// Rate limiting middleware
+function rateLimitMiddleware(req, res, next) {
+  const clientIP = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket?.remoteAddress || 'unknown';
+  
+  // Get or create rate limit data for this IP
+  if (!rateLimitStore.has(clientIP)) {
+    rateLimitStore.set(clientIP, {
+      uploads: [],
+      violations: 0,
+      blockedUntil: null
+    });
+  }
+  
+  const rateData = rateLimitStore.get(clientIP);
+  const now = Date.now();
+  
+  // Check if IP is blocked
+  if (rateData.blockedUntil && now < rateData.blockedUntil) {
+    const remainingTime = Math.ceil((rateData.blockedUntil - now) / 1000 / 60);
+    return res.status(429).json({ 
+      error: `Rate limit exceeded. Please try again in ${remainingTime} minutes.`,
+      blockedUntil: rateData.blockedUntil
+    });
+  }
+  
+  // Clean old upload records (older than 24 hours)
+  rateData.uploads = rateData.uploads.filter(upload => now - upload.timestamp < 24 * 60 * 60 * 1000);
+  
+  // Check limits
+  const minuteUploads = rateData.uploads.filter(upload => now - upload.timestamp < 60 * 1000);
+  const hourUploads = rateData.uploads.filter(upload => now - upload.timestamp < 60 * 60 * 1000);
+  const dayUploads = rateData.uploads.filter(upload => now - upload.timestamp < 24 * 60 * 60 * 1000);
+  
+  const hourlySize = hourUploads.reduce((total, upload) => total + upload.size, 0);
+  
+  // Check violations
+  let violation = false;
+  let violationMessage = '';
+  
+  if (minuteUploads.length >= RATE_LIMITS.perMinute) {
+    violation = true;
+    violationMessage = 'Too many uploads per minute. Please wait before uploading again.';
+  } else if (hourUploads.length >= RATE_LIMITS.perHour) {
+    violation = true;
+    violationMessage = 'Hourly upload limit reached. Please try again later.';
+  } else if (dayUploads.length >= RATE_LIMITS.perDay) {
+    violation = true;
+    violationMessage = 'Daily upload limit reached. Please try again tomorrow.';
+  } else if (hourlySize >= RATE_LIMITS.hourlySize) {
+    violation = true;
+    violationMessage = 'Hourly file size limit reached. Please try again later.';
+  }
+  
+  if (violation) {
+    rateData.violations++;
+    
+    // Progressive punishment
+    let blockDuration = 0;
+    if (rateData.violations === 1) {
+      blockDuration = 5 * 60 * 1000; // 5 minutes
+    } else if (rateData.violations === 2) {
+      blockDuration = 15 * 60 * 1000; // 15 minutes
+    } else if (rateData.violations === 3) {
+      blockDuration = 60 * 60 * 1000; // 1 hour
+    } else {
+      blockDuration = 24 * 60 * 60 * 1000; // 24 hours
+    }
+    
+    rateData.blockedUntil = now + blockDuration;
+    
+    console.log(`Rate limit violation for IP ${clientIP}: ${violationMessage}. Blocked for ${blockDuration/1000/60} minutes.`);
+    
+    return res.status(429).json({ 
+      error: violationMessage,
+      blockedUntil: rateData.blockedUntil,
+      violations: rateData.violations
+    });
+  }
+  
+  // Add upload record (will be populated in upload endpoint)
+  req.rateLimitData = rateData;
+  req.clientIP = clientIP;
+  
+  next();
+}
+
+// Clean up old rate limit data periodically (every hour)
+setInterval(() => {
+  const now = Date.now();
+  const oneDayAgo = now - 24 * 60 * 60 * 1000;
+  
+  for (const [ip, data] of rateLimitStore.entries()) {
+    // Remove old upload records
+    data.uploads = data.uploads.filter(upload => upload.timestamp > oneDayAgo);
+    
+    // Remove IP if no recent activity and not blocked
+    if (data.uploads.length === 0 && (!data.blockedUntil || now > data.blockedUntil)) {
+      rateLimitStore.delete(ip);
+    }
+  }
+  
+  console.log(`Rate limit cleanup: ${rateLimitStore.size} active IPs`);
+}, 60 * 60 * 1000); // Run every hour
+
 // Data storage functions
 
 // Data file path
@@ -72,7 +187,7 @@ app.use((error, req, res, next) => {
 });
 
 // Image upload endpoint
-app.post('/upload', upload.single('image'), async (req, res) => {
+app.post('/upload', rateLimitMiddleware, upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
@@ -131,6 +246,19 @@ app.post('/upload', upload.single('image'), async (req, res) => {
   
   // Save to JSON file
   saveData(imageMap);
+  
+  // Record upload activity for rate limiting
+  if (req.rateLimitData) {
+    req.rateLimitData.uploads.push({
+      timestamp: Date.now(),
+      size: req.file.size,
+      filename: outputFilename
+    });
+    
+    // Reset violations on successful upload
+    req.rateLimitData.violations = 0;
+    req.rateLimitData.blockedUntil = null;
+  }
   
   // Return both page link and image file link
   const pageUrl = `/img/${id}`;
@@ -210,6 +338,42 @@ app.get('/api/images', (req, res) => {
   }));
   
   res.json(images);
+});
+
+// Rate limit status endpoint (for debugging)
+app.get('/api/rate-limit-status', (req, res) => {
+  const clientIP = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket?.remoteAddress || 'unknown';
+  const rateData = rateLimitStore.get(clientIP);
+  
+  if (!rateData) {
+    return res.json({
+      ip: clientIP,
+      status: 'No rate limit data',
+      limits: RATE_LIMITS
+    });
+  }
+  
+  const now = Date.now();
+  const minuteUploads = rateData.uploads.filter(upload => now - upload.timestamp < 60 * 1000);
+  const hourUploads = rateData.uploads.filter(upload => now - upload.timestamp < 60 * 60 * 1000);
+  const dayUploads = rateData.uploads.filter(upload => now - upload.timestamp < 24 * 60 * 60 * 1000);
+  const hourlySize = hourUploads.reduce((total, upload) => total + upload.size, 0);
+  
+  res.json({
+    ip: clientIP,
+    status: {
+      isBlocked: rateData.blockedUntil && now < rateData.blockedUntil,
+      blockedUntil: rateData.blockedUntil,
+      violations: rateData.violations,
+      uploads: {
+        lastMinute: minuteUploads.length,
+        lastHour: hourUploads.length,
+        lastDay: dayUploads.length,
+        hourlySize: hourlySize
+      }
+    },
+    limits: RATE_LIMITS
+  });
 });
 
 app.listen(PORT, () => {

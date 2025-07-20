@@ -451,6 +451,23 @@
       -webkit-backdrop-filter: blur(8px) saturate(1.2);
       line-height: 1.5;
     }
+    
+    /* Toast type styles */
+    #toast.toast-error {
+      background: rgba(220, 53, 69, 0.9);
+      border-left: 4px solid #dc3545;
+    }
+    
+    #toast.toast-success {
+      background: rgba(40, 167, 69, 0.9);
+      border-left: 4px solid #28a745;
+    }
+    
+    #toast.toast-warning {
+      background: rgba(255, 193, 7, 0.9);
+      color: #212529;
+      border-left: 4px solid #ffc107;
+    }
     #toast.toast-show {
       display: block;
       opacity: 1;
@@ -1121,10 +1138,10 @@
     </div>
   </div>
   
-  <!-- 结束平铺布局 -->
+  <!-- End flat layout -->
   <script>
     const result = document.getElementById('result');
-    // 自动上传逻辑
+    // Auto upload logic
     function uploadImage(file) {
       console.log('Upload started for file:', file.name);
       if (!file) return;
@@ -1156,7 +1173,7 @@
             const percent = Math.round((e.loaded / e.total) * 100);
             showProgress(percent);
         } else {
-          // 如果无法计算进度，至少显示进度条
+          // If progress cannot be calculated, at least show progress bar
           showProgress(10);
           }
         };
@@ -1164,26 +1181,41 @@
           hideProgress();
           let data = {};
           try { data = JSON.parse(xhr.responseText); } catch {}
+          
+          // Handle rate limit errors specifically
+          if (xhr.status === 429) {
+            let message = data.error || 'Rate limit exceeded';
+            if (data.blockedUntil) {
+              const remainingTime = Math.ceil((data.blockedUntil - Date.now()) / 1000 / 60);
+              message = `Rate limit exceeded. Please try again in ${remainingTime} minutes.`;
+            }
+            showToast(message, 'error');
+            result.classList.remove('show');
+            result.style.display = 'block';
+            result.textContent = message;
+            return;
+          }
+          
           if (data.url) {
           const filename = (fileInput.files[0] && fileInput.files[0].name) || 'image';
-          // 使用动态域名，支持部署上线
+          // Use dynamic domain, support deployment
           const baseUrl = window.location.origin;
           const pageLink = `${baseUrl}/img/${data.url.split('/').pop()}`;
           const imageLink = `${baseUrl}${data.imageLink}`;  // 使用后端返回的完整图片链接
-          // 对标postimg的两种Markdown格式
+          // Two Markdown formats matching postimg
           const markdownReddit = `[${filename}](${pageLink})`;
           const markdownGithub = `[![${filename}](${imageLink})](${pageLink})`;
-          // Thumbnail格式：使用缩略图链接
+          // Thumbnail format: use thumbnail link
           const forumThumb = `[url=${pageLink}][img]${pageLink}[/img][/url]`;
           const websiteThumb = `<a href='${pageLink}' target='_blank'><img src='${pageLink}' alt='${filename}' /></a>`;
-          // Hotlink格式：使用直接图片链接
+          // Hotlink format: use direct image link
           const forumHotlink = `[url=${pageLink}][img]${imageLink}[/img][/url]`;
           const websiteHotlink = `<a href='${pageLink}' target='_blank'><img src='${imageLink}' alt='${filename}' /></a>`;
           const removalLink = `${baseUrl}/delete/${data.url.split('/').pop()}`;
-                                  // SVG图标
+                                  // SVG icons
             const redditIcon = `<svg width='24' height='24' viewBox='0 0 24 24' style='vertical-align:middle;margin-right:4px;'><path d='M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z' fill='#FF4500'/></svg>`;
             const githubIcon = `<svg width='24' height='24' viewBox='0 0 20 20' style='vertical-align:middle;margin-right:4px;'><g><circle cx='10' cy='10' r='10' fill='#fff'/><path d='M10 2C5.58 2 2 5.58 2 10c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.013 8.013 0 0 0 18 10c0-4.42-3.58-8-8-8z' fill='#181717'/><rect x='13' y='13' width='5' height='2' rx='1' fill='#f48024'/></g></svg>`;
-          // 转义HTML字符串中的特殊字符
+          // Escape special characters in HTML strings
           const escapedWebsiteThumb = websiteThumb.replace(/'/g, "\\'").replace(/"/g, '\\"');
           const escapedWebsiteHotlink = websiteHotlink.replace(/'/g, "\\'").replace(/"/g, '\\"');
           result.innerHTML = `
@@ -1223,8 +1255,8 @@
         };
         xhr.send(formData);
       }
-    // 拖拽上传功能
-    // 保证fileInput2和fileInput都指向id为imageInput的input元素
+    // Drag and drop upload functionality
+    // Ensure fileInput2 and fileInput both point to the input element with id imageInput
     const fileInput = document.getElementById('imageInput');
     const fileInput2 = fileInput;
     const fileNameSpan = document.getElementById('fileName');
@@ -1253,7 +1285,7 @@
         uploadImage(fileInput.files[0]);
       }
     });
-    // 自定义文件选择按钮逻辑 - 移除不存在的元素引用
+    // Custom file selection button logic - remove references to non-existent elements
 
     // Management panel functionality
     const manageBtn = document.getElementById('manageBtn');
@@ -1455,11 +1487,24 @@
     }
 
     // Toast popup
-    function showToast(msg) {
+    function showToast(msg, type = 'info') {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
+      
+      // Remove existing type classes
+      toast.classList.remove('toast-error', 'toast-success', 'toast-warning');
+      
+      // Add type-specific class
+      if (type === 'error') {
+        toast.classList.add('toast-error');
+      } else if (type === 'success') {
+        toast.classList.add('toast-success');
+      } else if (type === 'warning') {
+        toast.classList.add('toast-warning');
+      }
+      
       toast.classList.add('toast-show');
-      setTimeout(() => { toast.classList.remove('toast-show'); }, 1500);
+      setTimeout(() => { toast.classList.remove('toast-show'); }, 3000);
     }
 
     // Initialize page state
