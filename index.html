@@ -2094,6 +2094,51 @@
     backToTopBtn.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    // 动态SEO元信息优化 for My Images
+    function setMeta(name, content) {
+      let meta = document.querySelector(`meta[name='${name}']`);
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', name);
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', content);
+    }
+    function setMyImagesSEO() {
+      document.title = 'My Images - Manage & Share | Picfast';
+      setMeta('description', 'Manage your uploaded images on Picfast. Copy links, batch delete, and organize your image uploads easily.');
+    }
+    function setHomeSEO() {
+      document.title = 'Picfast - Free Image Upload & Share | Fast Image Hosting';
+      setMeta('description', 'Picfast is a free, fast, and reliable image upload and hosting service. Instantly upload your pictures and get shareable links for forums, blogs, social media, and more. No registration required.');
+    }
+    // 在切换页面时动态设置SEO
+    document.getElementById('myImagesLink').addEventListener('click', function() {
+      setMyImagesSEO();
+    });
+    document.getElementById('mobileMyImagesLink').addEventListener('click', function() {
+      setMyImagesSEO();
+    });
+    document.getElementById('uploadLink').addEventListener('click', function() {
+      setHomeSEO();
+    });
+    document.getElementById('mobileUploadLink').addEventListener('click', function() {
+      setHomeSEO();
+    });
+    // 页面首次加载默认首页SEO
+    setHomeSEO();
+
+    function setWindowsAppSEO() {
+      document.title = 'Windows App - Picfast';
+      setMeta('description', 'Download the Picfast Windows App for fast and easy image uploads directly from your desktop. Coming soon!');
+    }
+    document.getElementById('windowsAppLink').addEventListener('click', function() {
+      setWindowsAppSEO();
+    });
+    document.getElementById('mobileWindowsAppLink').addEventListener('click', function() {
+      setWindowsAppSEO();
+    });
   </script>
   <style>
     /* 优化toast弹窗移动端适配 */
