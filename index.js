@@ -50,16 +50,36 @@ const storage = multer.diskStorage({
     cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 // Allow CORS and parse forms
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Error handling middleware for multer
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'File size too large! Maximum size is 5MB.' });
+    }
+  }
+  next(error);
+});
+
 // Image upload endpoint
 app.post('/upload', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
+  }
+  
+  // Check file size (additional check)
+  if (req.file.size > 5 * 1024 * 1024) {
+    return res.status(400).json({ error: 'File size too large! Maximum size is 5MB.' });
   }
   let filename = req.file.filename;
   let ext = path.extname(filename);

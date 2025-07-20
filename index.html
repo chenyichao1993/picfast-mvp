@@ -862,6 +862,14 @@
     function uploadImage(file) {
       console.log('Upload started for file:', file.name);
       if (!file) return;
+      
+      // File size check (5MB = 5 * 1024 * 1024 bytes)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        showToast('File size too large! Maximum size is 5MB.');
+        return;
+      }
+      
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
       const isHeicExt = /\.heic$/i.test(file.name) || /\.heif$/i.test(file.name);
       if ((file.type && !allowedTypes.includes(file.type)) && !isHeicExt) {
