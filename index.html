@@ -538,19 +538,23 @@
         let data = {};
         try { data = JSON.parse(xhr.responseText); } catch {}
         if (data.url) {
-          const direct = location.origin + data.url;
+          const pageLink = location.origin + data.url;  // 页面链接，如 http://localhost:3000/img/1pZtfHHr
+          const imageLink = location.origin + data.url;  // 暂时使用相同链接，后续优化
           const filename = (fileInput.files[0] && fileInput.files[0].name) || 'image';
           // 对标postimg的两种Markdown格式
-          const markdownReddit = `[${filename}](${direct})`;
-          const markdownGithub = `[![${filename}](${direct})](${direct})`;
-          const forumThumb = `[url=${direct}][img]${direct}[/img][/url]`;
-          const websiteThumb = `<a href='${direct}' target='_blank'><img src='${direct}' alt='${filename}' /></a>`;
-          const forumHotlink = `[url=${direct}][img]${direct}[/img][/url]`;
-          const websiteHotlink = `<a href='${direct}' target='_blank'><img src='${direct}' alt='${filename}' /></a>`;
+          const markdownReddit = `[${filename}](${pageLink})`;
+          const markdownGithub = `[![${filename}](${imageLink})](${pageLink})`;
+          const forumThumb = `[url=${pageLink}][img]${imageLink}[/img][/url]`;
+          const websiteThumb = `<a href='${pageLink}' target='_blank'><img src='${imageLink}' alt='${filename}' /></a>`;
+          const forumHotlink = `[url=${pageLink}][img]${imageLink}[/img][/url]`;
+          const websiteHotlink = `<a href='${pageLink}' target='_blank'><img src='${imageLink}' alt='${filename}' /></a>`;
           const removalLink = `${location.origin}/delete/${data.url.split('/').pop()}`;
           // SVG图标
           const redditIcon = `<svg width='20' height='20' viewBox='0 0 20 20' style='vertical-align:middle;margin-right:4px;'><g><circle cx='10' cy='10' r='10' fill='#fff'/><circle cx='10' cy='10' r='9' fill='#ff4500'/><ellipse cx='10' cy='15' rx='6' ry='3' fill='#fff'/><circle cx='7' cy='10' r='2' fill='#fff'/><circle cx='13' cy='10' r='2' fill='#fff'/><circle cx='7' cy='10' r='1' fill='#000'/><circle cx='13' cy='10' r='1' fill='#000'/><circle cx='14.5' cy='5.5' r='1.2' fill='#fff'/><circle cx='14.5' cy='5.5' r='0.8' fill='#ff4500'/><path d='M14.5 5.5l-3.2-1' stroke='#000' stroke-width='0.5' fill='none'/></g></svg>`;
           const githubIcon = `<svg width='20' height='20' viewBox='0 0 20 20' style='vertical-align:middle;margin-right:4px;'><g><circle cx='10' cy='10' r='10' fill='#fff'/><path d='M10 2C5.58 2 2 5.58 2 10c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.15.46.55.38A8.013 8.013 0 0 0 18 10c0-4.42-3.58-8-8-8z' fill='#181717'/><rect x='13' y='13' width='5' height='2' rx='1' fill='#f48024'/></g></svg>`;
+          // 转义HTML字符串中的特殊字符
+          const escapedWebsiteThumb = websiteThumb.replace(/'/g, "\\'").replace(/"/g, '\\"');
+          const escapedWebsiteHotlink = websiteHotlink.replace(/'/g, "\\'").replace(/"/g, '\\"');
           result.innerHTML = `
             <div class="result-flex">
               <div class="result-thumb">
@@ -559,14 +563,14 @@
               </div>
               <div class="result-links">
                 <div style="margin-bottom:18px;font-weight:bold;font-size:1.18rem;text-align:center;">Upload successful!</div>
-                <div class="copy-row"><span class="copy-label">Link:</span><input type="text" value="${direct}" readonly /><button type="button" onclick="copyToClipboard('${direct}', this)">Copy</button></div>
-                <div class="copy-row"><span class="copy-label">Direct link:</span><input type="text" value="${direct}" readonly /><button type="button" onclick="copyToClipboard('${direct}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Link:</span><input type="text" value="${pageLink}" readonly /><button type="button" onclick="copyToClipboard('${pageLink}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Direct link:</span><input type="text" value="${imageLink}" readonly /><button type="button" onclick="copyToClipboard('${imageLink}', this)">Copy</button></div>
                 <div class="copy-row"><span class="copy-label">${redditIcon}Markdown:</span><input type="text" value="${markdownReddit}" readonly /><button type="button" onclick="copyToClipboard('${markdownReddit}', this)">Copy</button></div>
                 <div class="copy-row"><span class="copy-label">${githubIcon}Markdown:</span><input type="text" value="${markdownGithub}" readonly /><button type="button" onclick="copyToClipboard('${markdownGithub}', this)">Copy</button></div>
                 <div class="copy-row"><span class="copy-label">Thumbnail for forums:</span><input type="text" value="${forumThumb}" readonly /><button type="button" onclick="copyToClipboard('${forumThumb}', this)">Copy</button></div>
-                <div class="copy-row"><span class="copy-label">Thumbnail for website:</span><input type="text" value="${websiteThumb}" readonly /><button type="button" onclick="copyToClipboard('${websiteThumb}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Thumbnail for website:</span><input type="text" value="${websiteThumb}" readonly /><button type="button" onclick="copyToClipboard('${escapedWebsiteThumb}', this)">Copy</button></div>
                 <div class="copy-row"><span class="copy-label">Hotlink for forums:</span><input type="text" value="${forumHotlink}" readonly /><button type="button" onclick="copyToClipboard('${forumHotlink}', this)">Copy</button></div>
-                <div class="copy-row"><span class="copy-label">Hotlink for website:</span><input type="text" value="${websiteHotlink}" readonly /><button type="button" onclick="copyToClipboard('${websiteHotlink}', this)">Copy</button></div>
+                <div class="copy-row"><span class="copy-label">Hotlink for website:</span><input type="text" value="${websiteHotlink}" readonly /><button type="button" onclick="copyToClipboard('${escapedWebsiteHotlink}', this)">Copy</button></div>
                 <div class="copy-row"><span class="copy-label">Removal link:</span><input type="text" value="${removalLink}" readonly /><button type="button" onclick="copyToClipboard('${removalLink}', this)">Copy</button></div>
                 <div style="margin-bottom:8px;text-align:center;"><a href="${data.url}" target="_blank">View Image</a></div>
               </div>
