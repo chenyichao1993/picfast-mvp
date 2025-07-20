@@ -6,6 +6,146 @@
   <title>Image Upload & Share</title>
   <style>
     body { font-family: 'Inter', 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f6f8fb; }
+    
+    /* Header Styles */
+    .main-header {
+      background: #fff;
+      border-bottom: 1px solid #e1e5e9;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo-img {
+      height: 32px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .logo-img:hover {
+      transform: scale(1.05);
+    }
+    
+    .main-nav {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      text-decoration: none;
+      color: #666;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .nav-link:hover {
+      color: #007bff;
+      background: #f8f9fa;
+    }
+    
+    .nav-link.active {
+      color: #007bff;
+      background: #e3f2fd;
+    }
+    
+    .user-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .login-btn {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    
+    .login-btn:hover {
+      background: #f8f9fa;
+    }
+    
+    .signup-btn {
+      text-decoration: none;
+      color: #fff;
+      background: #007bff;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    
+    .signup-btn:hover {
+      background: #0056b3;
+    }
+    
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+    
+    .mobile-menu-btn span {
+      width: 24px;
+      height: 2px;
+      background: #666;
+      transition: all 0.3s;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .main-nav {
+        display: none;
+      }
+      
+      .user-actions {
+        display: none;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .header-content {
+        padding: 0 15px;
+      }
+    }
+    .page-title {
+      text-align: center;
+      padding: 40px 20px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
     h1 {
       text-align: center;
       font-size: 3.5rem;
@@ -818,12 +958,40 @@
   </style>
 </head>
 <body>
-  <!-- 平铺布局，无container卡片 -->
-  <div class="header-container">
+  <!-- Header with Logo and Navigation -->
+  <header class="main-header">
+    <div class="header-content">
+      <!-- Logo -->
+      <div class="logo">
+        <img src="picfast.png" alt="picfast" class="logo-img">
+      </div>
+      
+      <!-- Navigation -->
+      <nav class="main-nav">
+        <a href="#" class="nav-link active" id="uploadLink">Upload</a>
+        <a href="#" class="nav-link" id="myImagesLink">My Images</a>
+        <a href="#" class="nav-link" id="windowsAppLink">Windows App</a>
+      </nav>
+      
+      <!-- User Actions -->
+      <div class="user-actions">
+        <a href="#" class="login-btn">Login</a>
+        <a href="#" class="signup-btn">Sign Up</a>
+      </div>
+      
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+  <!-- Page Title -->
+  <div class="page-title">
     <h1>Image Upload & Share</h1>
-    <button id="manageBtn" class="manage-btn">Manage Images</button>
+    <p class="subtitle">Quickly upload images and get shareable links for free.</p>
   </div>
-  <p class="subtitle">Quickly upload images and get shareable links for free.</p>
   <div id="dropArea">Drag & drop image here or <span id="dropChoose" style="color:#007bff;text-decoration:underline;cursor:pointer;">choose file</span></div>
         <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" />
   <div id="fileName" style="display:none;"></div>
@@ -1002,22 +1170,24 @@
       document.getElementById('dropArea').style.display = 'none';
       progressBar.style.display = 'none';
       document.getElementById('result').style.display = 'none';
-      document.querySelector('h1').style.display = 'none';
-      document.querySelector('.subtitle').style.display = 'none';
+      document.querySelector('.page-title').style.display = 'none';
       document.querySelector('#fileName').style.display = 'none';
       document.querySelector('#imageInput').style.display = 'none';
       
       // Show management panel
       managementPanel.classList.add('show');
       loadImageList();
+      
+      // Update navigation
+      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      document.getElementById('myImagesLink').classList.add('active');
     }
 
     // Hide management panel
     function hideManagementPanel() {
       // Show main content
       document.getElementById('dropArea').style.display = '';
-      document.querySelector('h1').style.display = '';
-      document.querySelector('.subtitle').style.display = '';
+      document.querySelector('.page-title').style.display = '';
       document.querySelector('#imageInput').style.display = 'none'; // Keep hidden as it should be
       
       // Reset upload state - but keep result content if it exists
@@ -1031,6 +1201,10 @@
       
       // Hide management panel
       managementPanel.classList.remove('show');
+      
+      // Update navigation
+      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      document.getElementById('uploadLink').classList.add('active');
     }
 
     // Load image list
@@ -1135,15 +1309,20 @@
       document.addEventListener('keydown', handleEscape);
     }
 
-    // Event listeners
-    manageBtn.addEventListener('click', () => {
-      console.log('Manage button clicked');
-      showManagementPanel();
-    });
-    backBtn.addEventListener('click', () => {
-      console.log('Back button clicked');
-      hideManagementPanel();
-    });
+    // Event listeners for management panel
+    if (manageBtn) {
+      manageBtn.addEventListener('click', () => {
+        console.log('Manage button clicked');
+        showManagementPanel();
+      });
+    }
+    
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        console.log('Back button clicked');
+        hideManagementPanel();
+      });
+    }
 
 
 
@@ -1191,6 +1370,55 @@
       document.getElementById('imageInput').value = '';
     }
 
+    // Navigation functionality
+    document.getElementById('uploadLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      showUploadPage();
+    });
+    
+    document.getElementById('myImagesLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      showManagementPanel();
+    });
+    
+    document.getElementById('windowsAppLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      showToast('Windows App coming soon!');
+    });
+    
+    // Logo click functionality
+    document.querySelector('.logo-img').addEventListener('click', function() {
+      showUploadPage();
+    });
+    
+    // Mobile menu functionality
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+      // TODO: Implement mobile menu
+      showToast('Mobile menu coming soon!');
+    });
+    
+    // Show upload page function
+    function showUploadPage() {
+      // Hide management panel if visible
+      document.getElementById('managementPanel').classList.remove('show');
+      
+      // Show main content
+      document.getElementById('dropArea').style.display = '';
+      document.querySelector('.page-title').style.display = '';
+      document.querySelector('#imageInput').style.display = 'none';
+      
+      // Reset upload state
+      progressBar.style.display = 'none';
+      document.getElementById('progressInner').style.width = '0';
+      document.getElementById('fileName').style.display = 'none';
+      document.getElementById('fileName').textContent = '';
+      document.getElementById('imageInput').value = '';
+      
+      // Update navigation
+      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      document.getElementById('uploadLink').classList.add('active');
+    }
+    
     // Initialize page on load
     window.onload = initializePage;
 
