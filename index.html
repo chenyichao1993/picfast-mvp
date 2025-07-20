@@ -1169,6 +1169,26 @@
       }
     }
   </style>
+  <style>
+    .footer-content-body.faq {
+      line-height: 1.4;
+      padding-bottom: 80px;
+    }
+    @media (max-width: 600px) {
+      .footer-content-body.faq {
+        padding-bottom: 120px;
+      }
+    }
+    .footer-content-body.faq h1,
+    .footer-content-body.faq h2 {
+      margin-top: 1.1em;
+      margin-bottom: 0.5em;
+    }
+    .footer-content-body.faq p {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+  </style>
 </head>
 <body>
   <!-- Header with Logo and Navigation -->
@@ -1967,18 +1987,12 @@
           <div style="text-align:left;display:inline-block;width:100%;">
             ${content[type] || ''}
           </div>
-          <button id="backToMainBtn" style="margin-top:32px;padding:12px 32px;font-size:1.1rem;border-radius:8px;border:none;background:#1976d2;color:#fff;cursor:pointer;">Back to Home</button>
         </div>
       `;
       footerContent.style.display = 'block';
       window.scrollTo({top:0,behavior:'smooth'});
       // 隐藏footer以外内容
       document.querySelector('footer').scrollIntoView({behavior:'smooth',block:'end'});
-      // 返回主页按钮
-      document.getElementById('backToMainBtn').onclick = function() {
-        footerContent.style.display = 'none';
-        document.querySelector('.main-content').style.display = '';
-      };
     }
 
     // --- Batch selection and deletion logic ---
