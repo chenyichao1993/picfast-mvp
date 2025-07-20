@@ -107,8 +107,9 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// New: Static file service for frontend
+// Static file service for frontend and root directory files
 app.use(express.static(__dirname));
+app.use('/', express.static(path.join(__dirname)));
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
