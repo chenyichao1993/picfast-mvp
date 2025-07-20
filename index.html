@@ -1156,6 +1156,7 @@
   
   <!-- End flat layout -->
   </div>
+  <div id="footerContent" style="display:none;"></div>
   <footer class="site-footer">
     <div class="footer-links">
       <div class="footer-nav">
@@ -1188,6 +1189,11 @@
       font-size: 1rem;
       color: #666;
       text-align: center;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
     }
     .footer-links {
       display: flex;
@@ -1231,6 +1237,10 @@
       .site-footer {
         font-size: 0.98rem;
         padding: 18px 0 10px 0;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
       }
       .footer-link {
         font-size: 0.97rem;
@@ -1742,7 +1752,11 @@
     // 页脚导航点击事件（可后续扩展）
     document.querySelectorAll('.footer-link').forEach(link => {
       link.addEventListener('click', function(e) {
-        if (this.textContent === 'Upload') {
+        const helpTitles = ['About', 'Terms of Use', 'Privacy Policy', 'FAQ', 'Contact us'];
+        if (helpTitles.includes(this.textContent)) {
+          e.preventDefault();
+          showFooterContent(this.textContent);
+        } else if (this.textContent === 'Upload') {
           showUploadPage();
           e.preventDefault();
         } else if (this.textContent === 'Windows App') {
@@ -1754,6 +1768,102 @@
         }
       });
     });
+
+    // 显示footer内容区
+    function showFooterContent(type) {
+      // 隐藏主内容
+      document.querySelector('.main-content').style.display = 'none';
+      if (document.getElementById('managementPanel')) document.getElementById('managementPanel').classList.remove('show');
+      // 填充内容
+      const content = {
+        'About': `
+          <h1>About Picfast</h1>
+          <div class="footer-content-body">
+            <p><strong>Picfast</strong> is a free, fast, and reliable <b>image upload</b> and <b>image hosting</b> service. Instantly upload your pictures and get shareable links for forums, blogs, social media, and more. No registration required. Our mission is to make <b>image sharing</b> and <b>hotlinking</b> easy and accessible for everyone.</p>
+            <h2>Why Choose Us?</h2>
+            <ul>
+              <li>Unlimited free image uploads</li>
+              <li>Direct links for sharing and embedding</li>
+              <li>Fast and stable global CDN delivery</li>
+              <li>Supports JPG, PNG, GIF, WebP, HEIC and more</li>
+              <li>No registration required</li>
+              <li>Perfect for forums, blogs, eBay, Reddit, and more</li>
+            </ul>
+            <p>Join thousands of users who trust picfast for <b>free image hosting</b> and <b>photo sharing</b> every day.</p>
+          </div>
+        `,
+        'Terms of Use': `
+          <h1>Terms of Use</h1>
+          <div class="footer-content-body">
+            <p>By using <strong>picfast</strong>, you agree to the following terms:</p>
+            <ul>
+              <li>Do not upload illegal, pornographic, violent, or copyrighted content without permission.</li>
+              <li>We reserve the right to remove any content that violates our policies or applicable laws.</li>
+              <li>We are not responsible for any loss or damage resulting from the use of our service.</li>
+              <li>Images may be deleted if they violate our terms or are inactive for a long period.</li>
+              <li>We may update these terms at any time. Continued use means you accept the changes.</li>
+            </ul>
+            <p>For questions, please contact us at <a href="mailto:cocolovetin@foxmail.com">cocolovetin@foxmail.com</a>.</p>
+          </div>
+        `,
+        'Privacy Policy': `
+          <h1>Privacy Policy</h1>
+          <div class="footer-content-body">
+            <p>Your privacy is important to us. <strong>picfast</strong> does not require registration and does not sell or share your personal data with third parties.</p>
+            <ul>
+              <li>Uploaded images are stored securely and only accessible via their unique links.</li>
+              <li>We use cookies only for essential site functionality and analytics.</li>
+              <li>We do not collect personal information unless you contact us directly.</li>
+              <li>We may update this policy to comply with laws and improve transparency.</li>
+            </ul>
+            <p>For privacy concerns, contact <a href="mailto:cocolovetin@foxmail.com">cocolovetin@foxmail.com</a>.</p>
+          </div>
+        `,
+        'FAQ': `
+          <h1>Frequently Asked Questions (FAQ)</h1>
+          <h2>1. Is picfast free to use?</h2>
+          <p>Yes, picfast is 100% free for all users. No registration required.</p>
+          <h2>2. What image formats are supported?</h2>
+          <p>We support JPG, PNG, GIF, WebP, HEIC, and more.</p>
+          <h2>3. Are there any upload limits?</h2>
+          <p>Maximum file size is 5MB per image. Unlimited uploads.</p>
+          <h2>4. Can I hotlink images?</h2>
+          <p>Yes, direct links are provided for hotlinking on forums, blogs, eBay, Reddit, etc.</p>
+          <h2>5. How long are images stored?</h2>
+          <p>Images are stored indefinitely unless they violate our terms or are inactive for a long period.</p>
+          <h2>6. How do I delete an image?</h2>
+          <p>Each upload provides a unique removal link. Use it to delete your image at any time.</p>
+          <h2>7. Need more help?</h2>
+          <p>Contact us at <a href="mailto:cocolovetin@foxmail.com">cocolovetin@foxmail.com</a>.</p>
+        `,
+        'Contact us': `
+          <h1>Contact Us</h1>
+          <p>Have questions, suggestions, or need support? Reach out to us!</p>
+          <ul>
+            <li>Email: <a href="mailto:cocolovetin@foxmail.com">cocolovetin@foxmail.com</a></li>
+          </ul>
+          <p>We value your feedback and aim to respond within 24 hours.</p>
+        `
+      };
+      const footerContent = document.getElementById('footerContent');
+      footerContent.innerHTML = `
+        <div style="max-width:820px;margin:48px auto 32px auto;text-align:center;">
+          <div style="text-align:left;display:inline-block;width:100%;">
+            ${content[type] || ''}
+          </div>
+          <button id="backToMainBtn" style="margin-top:32px;padding:12px 32px;font-size:1.1rem;border-radius:8px;border:none;background:#1976d2;color:#fff;cursor:pointer;">Back to Home</button>
+        </div>
+      `;
+      footerContent.style.display = 'block';
+      window.scrollTo({top:0,behavior:'smooth'});
+      // 隐藏footer以外内容
+      document.querySelector('footer').scrollIntoView({behavior:'smooth',block:'end'});
+      // 返回主页按钮
+      document.getElementById('backToMainBtn').onclick = function() {
+        footerContent.style.display = 'none';
+        document.querySelector('.main-content').style.display = '';
+      };
+    }
   </script>
   <style>
     /* 优化toast弹窗移动端适配 */
@@ -1771,6 +1881,23 @@
         min-width: 100px;
         max-width: 98vw;
       }
+    }
+  </style>
+  <style>
+    .footer-content-body {
+      line-height: 1.7;
+      font-size: 1.18rem;
+    }
+    .footer-content-body h1 {
+      font-size: 2.6rem;
+      font-weight: bold;
+      margin-bottom: 1.2em;
+    }
+    .footer-content-body h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 1.5em;
+      margin-bottom: 0.7em;
     }
   </style>
 </body>
