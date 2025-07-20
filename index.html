@@ -538,8 +538,8 @@
         let data = {};
         try { data = JSON.parse(xhr.responseText); } catch {}
         if (data.url) {
-          const pageLink = location.origin + data.url;  // 页面链接，如 http://localhost:3000/img/1pZtfHHr
-          const imageLink = location.origin + data.url;  // 暂时使用相同链接，后续优化
+          const pageLink = location.origin + data.pageLink;  // 页面链接，如 http://localhost:3000/img/QKRqOXCh
+          const imageLink = location.origin + data.imageLink;  // 图片文件链接，如 http://localhost:3000/uploads/1234567890-image.jpg
           const filename = (fileInput.files[0] && fileInput.files[0].name) || 'image';
           // 对标postimg的两种Markdown格式
           const markdownReddit = `[${filename}](${pageLink})`;

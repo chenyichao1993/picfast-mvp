@@ -75,9 +75,14 @@ app.post('/upload', upload.single('image'), async (req, res) => {
   // Generate unique ID
   const id = nanoid(8);
   imageMap[id] = outputFilename;
-  // Return short link
-  const imageUrl = `/img/${id}`;
-  res.json({ url: imageUrl });
+  // Return both page link and image file link
+  const pageUrl = `/img/${id}`;
+  const imageUrl = `/uploads/${outputFilename}`;
+  res.json({ 
+    url: pageUrl,
+    pageLink: pageUrl,
+    imageLink: imageUrl
+  });
 });
 
 // New: Access image via short link
