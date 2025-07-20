@@ -1175,7 +1175,7 @@
       </div>
     </div>
     <div class="footer-copyright">
-      Powered by <b>picfast</b> &copy; <span id="footerYear"></span>
+      Powered by <b>Picfast</b> &copy; <span id="footerYear"></span>
     </div>
   </footer>
 
@@ -1789,13 +1789,13 @@
               <li>No registration required</li>
               <li>Perfect for forums, blogs, eBay, Reddit, and more</li>
             </ul>
-            <p>Join thousands of users who trust picfast for <b>free image hosting</b> and <b>photo sharing</b> every day.</p>
+            <p>Join thousands of users who trust Picfast for <b>free image hosting</b> and <b>photo sharing</b> every day.</p>
           </div>
         `,
         'Terms of Use': `
           <h1>Terms of Use</h1>
           <div class="footer-content-body">
-            <p>By using <strong>picfast</strong>, you agree to the following terms:</p>
+            <p>By using <strong>Picfast</strong>, you agree to the following terms:</p>
             <ul>
               <li>Do not upload illegal, pornographic, violent, or copyrighted content without permission.</li>
               <li>We reserve the right to remove any content that violates our policies or applicable laws.</li>
@@ -1809,7 +1809,7 @@
         'Privacy Policy': `
           <h1>Privacy Policy</h1>
           <div class="footer-content-body">
-            <p>Your privacy is important to us. <strong>picfast</strong> does not require registration and does not sell or share your personal data with third parties.</p>
+            <p>Your privacy is important to us. <strong>Picfast</strong> does not require registration and does not sell or share your personal data with third parties.</p>
             <ul>
               <li>Uploaded images are stored securely and only accessible via their unique links.</li>
               <li>We use cookies only for essential site functionality and analytics.</li>
@@ -1820,29 +1820,33 @@
           </div>
         `,
         'FAQ': `
-          <h1>Frequently Asked Questions (FAQ)</h1>
-          <h2>1. Is picfast free to use?</h2>
-          <p>Yes, picfast is 100% free for all users. No registration required.</p>
-          <h2>2. What image formats are supported?</h2>
-          <p>We support JPG, PNG, GIF, WebP, HEIC, and more.</p>
-          <h2>3. Are there any upload limits?</h2>
-          <p>Maximum file size is 5MB per image. Unlimited uploads.</p>
-          <h2>4. Can I hotlink images?</h2>
-          <p>Yes, direct links are provided for hotlinking on forums, blogs, eBay, Reddit, etc.</p>
-          <h2>5. How long are images stored?</h2>
-          <p>Images are stored indefinitely unless they violate our terms or are inactive for a long period.</p>
-          <h2>6. How do I delete an image?</h2>
-          <p>Each upload provides a unique removal link. Use it to delete your image at any time.</p>
-          <h2>7. Need more help?</h2>
-          <p>Contact us at <a href="mailto:cocolovetin@foxmail.com">cocolovetin@foxmail.com</a>.</p>
+          <div class="footer-content-body faq">
+            <h1>Frequently Asked Questions (FAQ)</h1>
+            <h2>1. Is Picfast free to use?</h2>
+            <p>Yes, Picfast is 100% free for all users. No registration required.</p>
+            <h2>2. What image formats are supported?</h2>
+            <p>We support JPG, PNG, GIF, WebP, HEIC, and more.</p>
+            <h2>3. Are there any upload limits?</h2>
+            <p>Maximum file size is 5MB per image. Unlimited uploads.</p>
+            <h2>4. Can I hotlink images?</h2>
+            <p>Yes, direct links are provided for hotlinking on forums, blogs, eBay, Reddit, etc.</p>
+            <h2>5. How long are images stored?</h2>
+            <p>Images are stored indefinitely unless they violate our terms or are inactive for a long period.</p>
+            <h2>6. How do I delete an image?</h2>
+            <p>Each upload provides a unique removal link. Use it to delete your image at any time.</p>
+            <h2>7. Need more help?</h2>
+            <p>Contact us at <a href="mailto:cocolovetin@foxmail.com">cocolovetin@foxmail.com</a>.</p>
+          </div>
         `,
         'Contact us': `
-          <h1>Contact Us</h1>
-          <p>Have questions, suggestions, or need support? Reach out to us!</p>
-          <ul>
-            <li>Email: <a href="mailto:cocolovetin@foxmail.com">cocolovetin@foxmail.com</a></li>
-          </ul>
-          <p>We value your feedback and aim to respond within 24 hours.</p>
+          <div class="footer-content-body contact">
+            <h1>Contact Us</h1>
+            <p>Have questions, suggestions, or need support? Reach out to us!</p>
+            <ul>
+              <li>Email: <a href="mailto:cocolovetin@foxmail.com">cocolovetin@foxmail.com</a></li>
+            </ul>
+            <p>We value your feedback and aim to respond within 24 hours.</p>
+          </div>
         `
       };
       const footerContent = document.getElementById('footerContent');
@@ -1898,6 +1902,42 @@
       font-weight: bold;
       margin-top: 1.5em;
       margin-bottom: 0.7em;
+    }
+    @media (max-width: 600px) {
+      .footer-content-body {
+        font-size: 1.01rem;
+        padding-left: 8px;
+        padding-right: 8px;
+        line-height: 1.55;
+      }
+      .footer-content-body h1 {
+        font-size: 2rem;
+        margin-bottom: 0.8em;
+        word-break: break-word;
+        text-align: center;
+      }
+      .footer-content-body h2 {
+        font-size: 1.13rem;
+        margin-top: 1.1em;
+        margin-bottom: 0.5em;
+        text-align: left;
+      }
+      .footer-content-body ul {
+        padding-left: 1.1em;
+        margin-bottom: 1em;
+      }
+      #footerContent > div {
+        margin: 18px auto 12px auto !important;
+        max-width: 99vw !important;
+      }
+      #backToMainBtn {
+        width: 90%;
+        min-width: 0;
+        font-size: 1.01rem !important;
+        padding: 12px 0 !important;
+        margin-top: 18px !important;
+        margin-bottom: 8px !important;
+      }
     }
   </style>
 </body>
