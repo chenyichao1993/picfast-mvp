@@ -750,7 +750,7 @@
   </div>
   <p class="subtitle">Quickly upload images and get shareable links for free.</p>
   <div id="dropArea">Drag & drop image here or <span id="dropChoose" style="color:#007bff;text-decoration:underline;cursor:pointer;">choose file</span></div>
-  <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" />
+        <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" />
   <div id="fileName" style="display:none;"></div>
   <div id="progressBar" style="display:none;width:96%;height:8px;background:#e3f0ff;border-radius:4px;overflow:hidden;margin:10px auto 0 auto;max-width:420px;">
     <div id="progressInner" style="height:100%;width:0;background:linear-gradient(90deg,#2196f3 0%,#007bff 100%);transition:width 0.2s;"></div>
@@ -771,11 +771,11 @@
   <!-- Custom Delete Confirmation Modal -->
   <div id="deleteModal" class="delete-modal">
     <div class="delete-modal-content">
-      <h3>确认删除</h3>
-      <p>确定要删除这张图片吗？</p>
+      <h3>Confirm Deletion</h3>
+      <p>Are you sure you want to delete this image?</p>
       <div class="delete-modal-buttons">
-        <button id="deleteConfirmBtn" class="delete-confirm-btn">确定</button>
-        <button id="deleteCancelBtn" class="delete-cancel-btn">取消</button>
+        <button id="deleteConfirmBtn" class="delete-confirm-btn">Confirm</button>
+        <button id="deleteCancelBtn" class="delete-cancel-btn">Cancel</button>
       </div>
     </div>
   </div>
@@ -800,22 +800,22 @@
       formData.append('image', file);
       result.textContent = 'Uploading...';
       result.classList.remove('show');
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/upload');
-      xhr.upload.onprogress = function(e) {
-        if (e.lengthComputable) {
-          const percent = Math.round((e.loaded / e.total) * 100);
-          showProgress(percent);
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/upload');
+        xhr.upload.onprogress = function(e) {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            showProgress(percent);
         } else {
           // 如果无法计算进度，至少显示进度条
           showProgress(10);
-        }
-      };
-      xhr.onload = function() {
-        hideProgress();
-        let data = {};
-        try { data = JSON.parse(xhr.responseText); } catch {}
-        if (data.url) {
+          }
+        };
+        xhr.onload = function() {
+          hideProgress();
+          let data = {};
+          try { data = JSON.parse(xhr.responseText); } catch {}
+          if (data.url) {
           const filename = (fileInput.files[0] && fileInput.files[0].name) || 'image';
           // 使用动态域名，支持部署上线
           const baseUrl = window.location.origin;
@@ -860,20 +860,20 @@
           result.classList.add('show');
           result.style.display = 'block';
           console.log('Upload successful, result displayed');
-        } else {
+          } else {
           result.classList.remove('show');
           result.style.display = 'block';
-          result.textContent = data.error || 'Upload failed';
-        }
-      };
-      xhr.onerror = function() {
-        hideProgress();
+            result.textContent = data.error || 'Upload failed';
+          }
+        };
+        xhr.onerror = function() {
+          hideProgress();
         result.classList.remove('show');
         result.style.display = 'block';
-        result.textContent = 'Upload failed, please try again';
-      };
-      xhr.send(formData);
-    }
+          result.textContent = 'Upload failed, please try again';
+        };
+        xhr.send(formData);
+      }
     // 拖拽上传功能
     // 保证fileInput2和fileInput都指向id为imageInput的input元素
     const fileInput = document.getElementById('imageInput');
@@ -958,7 +958,7 @@
         
         if (images.length === 0) {
           imageList.innerHTML = '<p style="text-align:center;color:#666;margin:20px;">No images uploaded yet.</p>';
-          return;
+        return;
         }
 
         // Sort images by upload time, newest first
