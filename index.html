@@ -1167,6 +1167,10 @@
   <div class="management-panel" id="managementPanel">
     <button class="back-btn" id="backBtn">← Back to Upload</button>
     <h2>Manage Images</h2>
+    <div class="image-list-controls" id="imageListControls" style="display:flex;align-items:center;gap:16px;margin-bottom:18px;justify-content:flex-start;">
+      <button id="selectAllBtn" type="button">Select All</button>
+      <button id="deleteSelectedBtn" type="button" disabled>Delete Selected</button>
+    </div>
     <div class="image-list" id="imageList">
       <!-- Images will be loaded here -->
     </div>
@@ -1498,6 +1502,7 @@
 
         imageList.innerHTML = sortedImages.map(image => `
           <div class="image-item">
+            <input type="checkbox" class="image-checkbox" data-id="${image.id}" style="margin-right:12px;transform:scale(1.2);">
             <img src="${image.directUrl}" alt="${image.originalName}" onerror="this.style.display='none'">
             <div class="image-info">
               <div class="image-name">${image.originalName}</div>
@@ -1520,11 +1525,12 @@
 
     // Delete image
     async function deleteImage(id, button) {
-      // Show custom delete modal
       const deleteModal = document.getElementById('deleteModal');
       const confirmBtn = document.getElementById('deleteConfirmBtn');
       const cancelBtn = document.getElementById('deleteCancelBtn');
-      
+      // 重置弹窗内容为单张删除
+      deleteModal.querySelector('h3').textContent = 'Confirm Deletion';
+      deleteModal.querySelector('p').textContent = 'Are you sure you want to delete this image?';
       deleteModal.style.display = 'block';
       
       // Handle confirm
@@ -1915,6 +1921,107 @@
         document.querySelector('.main-content').style.display = '';
       };
     }
+
+    // --- Batch selection and deletion logic ---
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    let allSelected = false;
+
+    // 监听图片列表变化，动态绑定checkbox事件
+    function updateCheckboxEvents() {
+      const checkboxes = document.querySelectorAll('.image-checkbox');
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateBatchButtons);
+      });
+    }
+
+    // 更新按钮状态和Select All文本
+    function updateBatchButtons() {
+      const checkboxes = document.querySelectorAll('.image-checkbox');
+      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      deleteSelectedBtn.disabled = checked.length === 0;
+      if (checked.length === checkboxes.length && checkboxes.length > 0) {
+        selectAllBtn.textContent = 'Unselect All';
+        allSelected = true;
+      } else {
+        selectAllBtn.textContent = 'Select All';
+        allSelected = false;
+      }
+    }
+
+    // Select All/Unselect All 按钮逻辑
+    selectAllBtn.addEventListener('click', () => {
+      const checkboxes = document.querySelectorAll('.image-checkbox');
+      checkboxes.forEach(cb => { cb.checked = !allSelected; });
+      updateBatchButtons();
+    });
+
+    // 批量删除按钮逻辑
+    deleteSelectedBtn.addEventListener('click', async () => {
+      const checkboxes = document.querySelectorAll('.image-checkbox:checked');
+      if (checkboxes.length === 0) return;
+      showBatchDeleteModal(checkboxes.length, async () => {
+        deleteSelectedBtn.disabled = true;
+        // 直接批量请求后端删除接口，不再调用deleteImage（避免重复弹窗）
+        for (const cb of checkboxes) {
+          const id = cb.getAttribute('data-id');
+          const btn = cb.closest('.image-item').querySelector('.delete-btn');
+          btn.disabled = true;
+          btn.textContent = 'Deleting...';
+          try {
+            await fetch(`/delete/${id}`, { method: 'DELETE' });
+            cb.closest('.image-item').remove();
+          } catch {}
+        }
+        setTimeout(() => { loadImageList(); }, 500);
+      });
+    });
+
+    // 批量删除自定义弹窗逻辑
+    function showBatchDeleteModal(count, onConfirm) {
+      const deleteModal = document.getElementById('deleteModal');
+      const confirmBtn = document.getElementById('deleteConfirmBtn');
+      const cancelBtn = document.getElementById('deleteCancelBtn');
+      // 修改弹窗内容
+      deleteModal.querySelector('h3').textContent = 'Confirm Deletion';
+      deleteModal.querySelector('p').textContent = `Are you sure you want to delete ${count} selected image(s)?`;
+      deleteModal.style.display = 'block';
+      // 解绑旧事件
+      confirmBtn.onclick = null;
+      cancelBtn.onclick = null;
+      // 绑定新事件
+      confirmBtn.onclick = async () => {
+        deleteModal.style.display = 'none';
+        if (onConfirm) {
+          await onConfirm();
+        }
+      };
+      cancelBtn.onclick = () => {
+        deleteModal.style.display = 'none';
+      };
+      // 点击遮罩关闭
+      deleteModal.onclick = (e) => {
+        if (e.target === deleteModal) {
+          deleteModal.style.display = 'none';
+        }
+      };
+      // Esc关闭
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          deleteModal.style.display = 'none';
+          document.removeEventListener('keydown', handleEscape);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    // 在图片列表渲染后绑定checkbox事件
+    const origLoadImageList = loadImageList;
+    loadImageList = async function() {
+      await origLoadImageList.apply(this, arguments);
+      updateCheckboxEvents();
+      updateBatchButtons();
+    };
   </script>
   <style>
     /* 优化toast弹窗移动端适配 */
