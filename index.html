@@ -544,8 +544,10 @@
           // 对标postimg的两种Markdown格式
           const markdownReddit = `[${filename}](${pageLink})`;
           const markdownGithub = `[![${filename}](${imageLink})](${pageLink})`;
-          const forumThumb = `[url=${pageLink}][img]${imageLink}[/img][/url]`;
-          const websiteThumb = `<a href='${pageLink}' target='_blank'><img src='${imageLink}' alt='${filename}' /></a>`;
+          // Thumbnail格式：使用缩略图链接
+          const forumThumb = `[url=${pageLink}][img]${pageLink}[/img][/url]`;
+          const websiteThumb = `<a href='${pageLink}' target='_blank'><img src='${pageLink}' alt='${filename}' /></a>`;
+          // Hotlink格式：使用直接图片链接
           const forumHotlink = `[url=${pageLink}][img]${imageLink}[/img][/url]`;
           const websiteHotlink = `<a href='${pageLink}' target='_blank'><img src='${imageLink}' alt='${filename}' /></a>`;
           const removalLink = `${location.origin}/delete/${data.url.split('/').pop()}`;
