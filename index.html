@@ -5,6 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image Upload & Share</title>
   <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .main-content {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+    }
+    .site-footer {
+      flex-shrink: 0;
+    }
     body { font-family: 'Inter', 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f6f8fb; }
     
     /* Header Styles */
@@ -1066,20 +1087,17 @@
       <div class="logo">
         <img src="picfast.png" alt="picfast" class="logo-img">
       </div>
-      
       <!-- Navigation -->
       <nav class="main-nav">
         <a href="#" class="nav-link active" id="uploadLink">Upload</a>
         <a href="#" class="nav-link" id="myImagesLink">My Images</a>
         <a href="#" class="nav-link" id="windowsAppLink">Windows App</a>
       </nav>
-      
       <!-- User Actions -->
       <div class="user-actions">
         <a href="#" class="login-btn">Login</a>
         <a href="#" class="signup-btn">Sign Up</a>
       </div>
-      
       <!-- Mobile Menu Button -->
       <button class="mobile-menu-btn" id="mobileMenuBtn">
         <span></span>
@@ -1088,20 +1106,18 @@
       </button>
     </div>
   </header>
-  
-  <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobileMenu">
     <div class="mobile-menu-content">
       <a href="#" class="mobile-nav-link active" id="mobileUploadLink">Upload</a>
       <a href="#" class="mobile-nav-link" id="mobileMyImagesLink">My Images</a>
       <a href="#" class="mobile-nav-link" id="mobileWindowsAppLink">Windows App</a>
-      
       <div class="mobile-user-actions">
         <a href="#" class="mobile-login-btn">Login</a>
         <a href="#" class="mobile-signup-btn">Sign Up</a>
       </div>
     </div>
   </div>
+  <div class="main-content">
   <!-- Page Title -->
   <div class="page-title">
     <h1>Image Upload & Share</h1>
@@ -1139,6 +1155,89 @@
   </div>
   
   <!-- End flat layout -->
+  </div>
+  <footer class="site-footer">
+    <div class="footer-links">
+      <div class="footer-nav">
+        <a href="#" class="footer-link">Upload</a>
+        <a href="#" class="footer-link">Upload by URL</a>
+        <a href="#" class="footer-link">Website plugins</a>
+        <a href="#" class="footer-link">Windows App</a>
+      </div>
+      <div class="footer-help">
+        <a href="#" class="footer-link">About</a>
+        <a href="#" class="footer-link">Terms of Use</a>
+        <a href="#" class="footer-link">Privacy Policy</a>
+        <a href="#" class="footer-link">FAQ</a>
+        <a href="#" class="footer-link">Contact us</a>
+        <a href="#" class="footer-link" id="footerLanguages">Languages</a>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      Powered by <b>picfast</b> &copy; <span id="footerYear"></span>
+    </div>
+  </footer>
+
+  <style>
+    .site-footer {
+      width: 100%;
+      background: #fff;
+      border-top: 1px solid #e1e5e9;
+      margin-top: 48px;
+      padding: 28px 0 16px 0;
+      font-size: 1rem;
+      color: #666;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 10px;
+    }
+    .footer-nav, .footer-help {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: center;
+    }
+    .footer-link {
+      color: #1976d2;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+      font-size: 1rem;
+    }
+    .footer-link:hover {
+      color: #0d47a1;
+      text-decoration: underline;
+    }
+    .footer-copyright {
+      margin-top: 10px;
+      color: #888;
+      font-size: 0.98rem;
+    }
+    @media (max-width: 700px) {
+      .footer-links {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .footer-nav, .footer-help {
+        gap: 10px;
+      }
+    }
+    @media (max-width: 480px) {
+      .site-footer {
+        font-size: 0.98rem;
+        padding: 18px 0 10px 0;
+      }
+      .footer-link {
+        font-size: 0.97rem;
+      }
+    }
+  </style>
+  
   <script>
     const result = document.getElementById('result');
     // Auto upload logic
@@ -1633,6 +1732,46 @@
         }, 1200);
       });
     }
+
+    // 页脚年份自动更新，确保在DOM渲染后执行
+    window.addEventListener('DOMContentLoaded', function() {
+      var yearSpan = document.getElementById('footerYear');
+      if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+    });
+
+    // 页脚导航点击事件（可后续扩展）
+    document.querySelectorAll('.footer-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        if (this.textContent === 'Upload') {
+          showUploadPage();
+          e.preventDefault();
+        } else if (this.textContent === 'Windows App') {
+          showToast('Windows App coming soon!', 'info');
+          e.preventDefault();
+        } else if (this.textContent === 'Upload by URL' || this.textContent === 'Website plugins') {
+          showToast('Feature coming soon!', 'info');
+          e.preventDefault();
+        }
+      });
+    });
   </script>
+  <style>
+    /* 优化toast弹窗移动端适配 */
+    #toast {
+      max-width: 92vw;
+      min-width: 120px;
+      font-size: 1.13rem;
+      padding: 20px 8vw;
+      word-break: break-word;
+    }
+    @media (max-width: 600px) {
+      #toast {
+        font-size: 1.01rem;
+        padding: 14px 6vw;
+        min-width: 100px;
+        max-width: 98vw;
+      }
+    }
+  </style>
 </body>
 </html> 
