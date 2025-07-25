@@ -191,6 +191,11 @@ app.post('/upload', rateLimitMiddleware, upload.single('image'), async (req, res
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
+  // 新增：获取visitor_id
+  const visitor_id = req.body.visitor_id || req.headers['x-visitor-id'];
+  if (!visitor_id) {
+    return res.status(400).json({ error: 'Missing visitor_id' });
+  }
   
   // Check file size (additional check)
   if (req.file.size > 5 * 1024 * 1024) {
@@ -241,7 +246,8 @@ app.post('/upload', rateLimitMiddleware, upload.single('image'), async (req, res
     filename: outputFilename,
     originalName: req.file.originalname,
     uploadTime: new Date().toISOString(),
-    size: req.file.size
+    size: req.file.size,
+    owner_id: visitor_id // 新增：绑定owner_id
   };
   
   // Save to JSON file
@@ -327,16 +333,22 @@ app.delete('/delete/:id', (req, res) => {
 
 // Get all images endpoint
 app.get('/api/images', (req, res) => {
-  const images = Object.keys(imageMap).map(id => ({
-    id: id,
-    filename: imageMap[id].filename,
-    originalName: imageMap[id].originalName,
-    uploadTime: imageMap[id].uploadTime,
-    size: imageMap[id].size,
-    url: `/img/${id}`,
-    directUrl: `/uploads/${imageMap[id].filename}`
-  }));
-  
+  // 新增：只返回当前visitor_id的图片
+  const visitor_id = req.query.visitor_id || req.headers['x-visitor-id'];
+  if (!visitor_id) {
+    return res.status(400).json({ error: 'Missing visitor_id' });
+  }
+  const images = Object.keys(imageMap)
+    .filter(id => imageMap[id].owner_id === visitor_id)
+    .map(id => ({
+      id: id,
+      filename: imageMap[id].filename,
+      originalName: imageMap[id].originalName,
+      uploadTime: imageMap[id].uploadTime,
+      size: imageMap[id].size,
+      url: `/img/${id}`,
+      directUrl: `/uploads/${imageMap[id].filename}`
+    }));
   res.json(images);
 });
 
@@ -404,6 +416,18 @@ app.get('/robots.txt', (req, res) => {
   res.send(`User-agent: *\nDisallow: /uploads/\nAllow: /\nSitemap: ${base}/sitemap.xml\n`);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-}); 
+// ========== HTTPS 配置开始 ==========
+const https = require('https');
+
+const keyPath = process.env.SSL_KEY_PATH || './ssl/private/api.picfast.cc.key';
+const crtPath = process.env.SSL_CRT_PATH || './ssl/private/api.picfast.cc_bundle.crt';
+const privateKey = fs.readFileSync(keyPath, 'utf8');
+const certificate = fs.readFileSync(crtPath, 'utf8');
+
+https.createServer({ key: privateKey, cert: certificate }, app).listen(443, () => {
+  console.log('HTTPS server running at https://localhost:443');
+});
+// ========== HTTPS 配置结束 ==========
+// app.listen(PORT, () => {
+//   console.log(`Server running at http://localhost:${PORT}`);
+// }); 

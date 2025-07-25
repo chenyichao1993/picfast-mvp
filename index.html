@@ -1193,9 +1193,9 @@
     @media (min-width: 601px) {
       .footer-content-body {
         padding-bottom: 80px;
-      }
-    }
-  </style>
+  }
+}
+</style>
 </head>
 <body>
   <!-- Header with Logo and Navigation -->
@@ -1395,6 +1395,8 @@
       }
       const formData = new FormData();
       formData.append('image', file);
+      // 新增：带上visitor_id
+      formData.append('visitor_id', getVisitorId());
       result.textContent = 'Uploading...';
       result.classList.remove('show');
         const xhr = new XMLHttpRequest();
@@ -1575,7 +1577,9 @@
     // Load image list
     async function loadImageList() {
       try {
-        const response = await fetch('/api/images');
+        // 新增：带上visitor_id参数
+        const visitorId = getVisitorId();
+        const response = await fetch('/api/images?visitor_id=' + encodeURIComponent(visitorId));
         const images = await response.json();
         
         if (images.length === 0) {
@@ -1970,7 +1974,7 @@
                 <li><b>You may only upload images that you own or have the legal right to share.</b></li>
                 <li>Do not upload images that are illegal, infringe copyright, contain hate speech, violence, harassment, or any content that is offensive or prohibited by law.</li>
                 <li>Images that violate these terms will be removed without notice, and repeat offenders may be banned.</li>
-              </ul>
+            </ul>
             </article>
             <article>
               <h2>2. Prohibited Content</h2>
@@ -2059,7 +2063,7 @@
                 <li><b>Anonymous Uploads:</b> You do not need to register or provide any personal information to upload images. We do not collect your name, email, or any other personally identifiable information for anonymous uploads.</li>
                 <li><b>Contact Information:</b> If you contact us for support or feedback, we may collect your email address and any information you provide in your message.</li>
                 <li><b>Technical Data:</b> We automatically collect non-personal information such as your IP address, browser type, device information, and usage statistics to help us improve our service and ensure security.</li>
-              </ul>
+            </ul>
             </article>
             <article>
               <h2>How Do We Use Your Information?</h2>
@@ -2670,5 +2674,22 @@
   <button id="backToTopBtn" aria-label="Back to top">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
+
+  <script>
+    // 1. 生成并保存访客ID
+    function getVisitorId() {
+      let id = localStorage.getItem('visitor_id');
+      if (!id) {
+        if (window.crypto && window.crypto.randomUUID) {
+          id = crypto.randomUUID();
+        } else {
+          // 兼容老浏览器
+          id = 'v_' + Math.random().toString(36).substr(2, 16) + Date.now();
+        }
+        localStorage.setItem('visitor_id', id);
+      }
+      return id;
+    }
+  </script>
 </body>
 </html> 
