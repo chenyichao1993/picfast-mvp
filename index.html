@@ -1174,8 +1174,18 @@
       line-height: 1.4;
       padding-bottom: 80px;
     }
+    .footer-content-body.about,
+    .footer-content-body.terms,
+    .footer-content-body.privacy {
+      padding-bottom: 80px;
+    }
     @media (max-width: 600px) {
       .footer-content-body.faq {
+        padding-bottom: 120px;
+      }
+      .footer-content-body.about,
+      .footer-content-body.terms,
+      .footer-content-body.privacy {
         padding-bottom: 120px;
       }
     }
@@ -1951,7 +1961,7 @@
       const content = {
         'About': `
           <h1>About Picfast</h1>
-          <div class="footer-content-body">
+          <div class="footer-content-body about">
             <p><strong>Picfast</strong> is a free, fast, and reliable <b>image upload</b> and <b>image hosting</b> service. Instantly upload your pictures and get shareable links for forums, blogs, social media, and more. No registration required. Our mission is to make <b>image sharing</b> and <b>hotlinking</b> easy and accessible for everyone.</p>
             <h2>Why Choose Us?</h2>
             <ul>
@@ -1966,7 +1976,7 @@
           </div>
         `,
         'Terms of Use': `
-          <div class="footer-content-body">
+          <div class="footer-content-body terms">
             <h1>Terms of Use</h1>
             <article>
               <h2>1. Acceptable Use</h2>
@@ -2054,7 +2064,7 @@
           </div>
         `,
         'Privacy Policy': `
-          <div class="footer-content-body">
+          <div class="footer-content-body privacy">
             <h1>Privacy Policy</h1>
             <p>At Picfast, we are committed to protecting your privacy and ensuring a safe online experience. This Privacy Policy explains how we collect, use, and protect your information when you use our free image hosting service.</p>
             <article>
